@@ -12,12 +12,10 @@ public class MathUtilTest {
         treeMap.put(1.0, 1.0);
 
         IllegalArgumentException thrown = assertThrows(
-                IllegalArgumentException.class,
-                () -> MathUtil.getValueByKey(treeMap, 1.5),
-                "Expected getClosestValueRecursive() to throw, but it didn't"
+                IllegalArgumentException.class, () -> MathUtil.getValueByKey(treeMap, 1.5)
         );
 
-        assertTrue(thrown.getMessage().contains("TreeMap must contain at least two values"));
+        assertTrue(thrown.getMessage().contains("The specified value of key must lie between the minimum and maximum keys in the map."));
     }
 
     @Test
