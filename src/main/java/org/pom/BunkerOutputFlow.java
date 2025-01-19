@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import org.pom.utils.MathUtil;
 import org.pom.utils.io.csv.read.CsvReaderP;
 
 import java.io.File;
@@ -35,5 +36,9 @@ public class BunkerOutputFlow implements KeysValuesProvider<Double> {
     @Override
     public Collection<Double> keys() {
         return  Collections.unmodifiableCollection(outputFlowMap.keySet());
+    }
+
+    public Double getValueAtTau(double tau) {
+        return MathUtil.getValueByKey(outputFlowMap, tau);
     }
 }

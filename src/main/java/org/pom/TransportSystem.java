@@ -5,22 +5,35 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.pom.utils.MathUtil;
+import org.pom.utils.io.csv.write.CsvWriterP;
 import org.pom.utils.json.ObjectMapperFactory;
 import org.pom.utils.yaml.SettingsManager;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
+@NoArgsConstructor(force = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TransportSystem {
 
     @Getter
     private List<Conveyor> conveyors= new ArrayList<>();
-    private final List<Conveyor> rootConveyors;
-    private final String initDataPath;
+    /**
+     * A list of output conveyors of the transport system.
+     * Each {@link Conveyor} in the list represents a pathway for processed materials or items to exit the system.
+     */
+    private final List<Conveyor> outputConveyors = new ArrayList<>();
+    private final List<Conveyor> inputConveyors = new ArrayList<>();
+    @Getter
+    private String initDataPath;
     private final double researchTau;
     private final double deltaTau;
+    @Getter
     private final double deltaLength;
+    private SettingsManager settingsManager = new SettingsManager();
 
     // Map to store each conveyor and its children (downstream conveyors)
     private final Map<Conveyor, List<Conveyor>> conveyorTree;
@@ -37,59 +50,31 @@ public class TransportSystem {
         this.deltaTau = deltaTau;
         this.deltaLength = deltaLength;
         this.conveyors = conveyors;
-        this.rootConveyors = new ArrayList<>();
         this.conveyorTree = new HashMap<>();
     }
 
-    // Adds a root conveyor (no parent)
-    public void addRootConveyor(Conveyor conveyor) {
-        rootConveyors.add(conveyor);
-        conveyorTree.putIfAbsent(conveyor, new ArrayList<>());
+    /**
+     * This method allows dynamically adding a conveyor to the existing list of output conveyors.
+     * The conveyor added represents an additional pathway for processed materials or items to exit the system.
+     */
+    public void addOutputConveyors() {
+        conveyors.stream().filter(
+                conveyor -> conveyor.getConveyorNode().getOutputConveyorFlowMap().isEmpty()
+        ).forEach(outputConveyors::add);
     }
 
-    // Connects a parent conveyor to a child conveyor
-    public void connectConveyors(Conveyor parent, Conveyor child) {
-        conveyorTree.putIfAbsent(parent, new ArrayList<>());
-        conveyorTree.get(parent).add(child);
-        conveyorTree.putIfAbsent(child, new ArrayList<>());
+    /**
+     * This method allows dynamically adding a conveyor to the existing list of output conveyors.
+     * The conveyor added represents an additional pathway for processed materials or items to exit the system.
+     */
+    public void addInputConveyors() {
+        conveyors.stream().filter(
+                conveyor -> conveyor.getConveyorNode().getInputConveyorFlowMap().isEmpty()
+        ).forEach(inputConveyors::add);
     }
 
-    // Retrieves downstream conveyors for a given conveyor
-    public List<Conveyor> getChildren(Conveyor conveyor) {
-        return conveyorTree.getOrDefault(conveyor, Collections.emptyList());
-    }
-
-    // Updates bunker input for all conveyors in the tree
-    public void updateFlow() {
-        for (Conveyor root : rootConveyors) {
-            updateFlowRecursive(root);
-        }
-    }
-
-    // Recursive helper to propagate flow in the tree
-    private void updateFlowRecursive(Conveyor conveyor) {
-        var outputFlow = conveyor.getOutputFlow(); // Get output flow of current conveyor
-
-        for (Conveyor child : conveyorTree.getOrDefault(conveyor, Collections.emptyList())) {
-            //child.addParametersValues(child.getCurrentTau(), outputFlow, child.getBunkerOutput(), child.getSpeed());
-            updateFlowRecursive(child); // Recursively update children
-        }
-    }
-
-    // Finds all leaf conveyors (final conveyors with no children)
-    public List<Conveyor> getLeafConveyors() {
-        List<Conveyor> leaves = new ArrayList<>();
-        for (var entry : conveyorTree.entrySet()) {
-            if (entry.getValue().isEmpty()) {
-                leaves.add(entry.getKey());
-            }
-        }
-        return leaves;
-    }
-
-    private static void createTransportSystem() {
-        SettingsManager settingsManager = new SettingsManager();
-        var initTransportSystemFile = settingsManager.getApp().getInitTransportSystemFile();
+    public void createTransportSystem() {
+        var initTransportSystemFile = this.settingsManager.getApp().getInitTransportSystemFile();
         ObjectMapper objectMapper = ObjectMapperFactory.createTransportSystemMapper();
         TransportSystem transportSystem = null;
         try {
@@ -97,14 +82,130 @@ public class TransportSystem {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        conveyors = transportSystem.getConveyors();
+        initDataPath = transportSystem.getInitDataPath();
+    }
 
-      transportSystem.getConveyors().get(0);
+    public void processingTransportSystem() {
+        createTransportSystem();
+        addInputConveyors();
+        addOutputConveyors();
+        List<Double> taus = inputConveyors.stream()
+                .findFirst()
+                .map(conveyor -> new ArrayList<>(conveyor.getInputFlow().keys()))
+                .orElse(new ArrayList<>());
 
-        System.out.println(transportSystem);
+        taus.forEach(tau -> conveyors.forEach(conveyor -> calculatedConveyorParameters(tau, conveyor)));
+
+        var cellFormat = settingsManager.getPrepareDataTableFormat().getCellFormat();
+        var locale = settingsManager.getApp().getLocale();
+        var table = new ArrayList<List<String>>();
+        conveyors.forEach(conveyor -> {
+                    if (Objects.nonNull(conveyor.getInputFlow())) {
+                        table.add(
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.INPUT_FLOW), locale, cellFormat, conveyor.getInputFlow().values())
+                        );
+                    }
+                    if (Objects.nonNull(conveyor.getBunker())) {
+                        List.of(
+                                Constants.ColumnsNames.BUNKER_CAPACITY,
+                                Constants.ColumnsNames.BUNKER_OVER_MAX_CAPACITY,
+                                Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY,
+                                Constants.ColumnsNames.BUNKER_INPUT_FLOW,
+                                Constants.ColumnsNames.BUNKER_PLANED_OUTPUT_FLOW,
+                                Constants.ColumnsNames.BUNKER_REAL_OUTPUT_FLOW,
+                                Constants.ColumnsNames.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW
+                        ).forEach(key ->
+                                table.add(
+                                        CsvWriterP.createColumn(
+                                                Constants.ColumnsNames.generateHeader(conveyor.getId(), key),
+                                                locale,
+                                                cellFormat,
+                                                conveyor.getBunker().getValues(key)
+                                        )
+                                )
+                        );
+                    }
+                    if (Objects.nonNull(conveyor.getSpeed())) {
+                        table.add(
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.SPEED), locale, cellFormat, conveyor.getSpeed().values())
+                        );
+                    }
+                    if (Objects.nonNull(conveyor.getDensity())) {
+                        table.add(
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.DENSITY), locale, cellFormat, conveyor.getDensity().values())
+                        );
+                    }
+                    if (Objects.nonNull(conveyor.getOutputFlow())) {
+                        table.add(
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.OUTPUT_FLOW), locale, cellFormat, conveyor.getOutputFlow().values())
+                        );
+                    }
+                    if (Objects.nonNull(conveyor.getBunkerOutputFlow())) {
+                        table.add(
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.BUNKER_OUTPUT_FLOW), locale, cellFormat, conveyor.getBunkerOutputFlow().values())
+                        );
+                    }
+                    if (Objects.nonNull(conveyor.getConveyorNode())) {
+                        var keys = conveyor.getConveyorNode().getOutputConveyorFlowMap().keySet();
+                        keys.forEach(key ->
+                                table.add(
+                                        CsvWriterP.createColumn(
+                                                Constants.ColumnsNames.generateHeader(
+                                                        conveyor.getId(), Constants.JsonParametersNames.CONVEYOR_NODE, key
+                                                ),
+                                                locale,
+                                                cellFormat,
+                                                conveyor.getConveyorNode().values(key))
+                                )
+                        );
+                    }
+                }
+        );
+
+        var transposeTable = MathUtil.transposeMatrix(table," "::repeat);
+        File file = new File(initDataPath);
+        var csvWriterP = new CsvWriterP("12.1", ';', file.getParent(), "result" + file.getName());
+        csvWriterP.writeToFile(transposeTable);
+        System.out.println("transportSystem");
+
+
+
+
+
+        System.out.println();
+    }
+
+    private void calculatedConveyorParameters(Double tau, Conveyor conveyor) {
+        var inputConveyorNumbers
+                = Collections.unmodifiableCollection(conveyor.getConveyorNode().getInputConveyorFlowMap().keySet());
+        inputConveyorNumbers.forEach(
+                inputConveyorNumber -> {
+                    var inputConveyor = getConveyorById(inputConveyorNumber);
+                    if (inputConveyor.getOutputFlow().lastKey()< tau) {
+                        calculatedConveyorParameters(tau, inputConveyor);
+                    }
+                }
+        );
+        calculatedParameters(tau, conveyor);
+    }
+
+    private Conveyor getConveyorById(Integer id) {
+        return conveyors.stream().filter(conveyor -> id == conveyor.getId()).findFirst().orElse(null);
+    }
+
+    private void calculatedParameters(Double tau, Conveyor conveyor) {
+        var inputFlow = conveyor.getCombinedInputFlow(tau, this::getConveyorById);
+        var speed = conveyor.getSpeed().getSpeedAtTau(tau);
+        var plannedBunkerOutput = Objects.isNull(conveyor.getBunkerOutputFlow())
+                ? conveyor.getBunker().getMaxAvailableOutput() : conveyor.getBunkerOutputFlow().getValueAtTau(tau);
+        conveyor.addParametersValues(tau, inputFlow.getValue(tau), plannedBunkerOutput, speed);
     }
 
     public static void main(String[] args) {
-        createTransportSystem();
+        TransportSystem transportSystem = new TransportSystem();
+        transportSystem.createTransportSystem();
+        transportSystem.processingTransportSystem();
     }
 }
 

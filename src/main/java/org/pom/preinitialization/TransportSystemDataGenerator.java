@@ -63,12 +63,12 @@ public class TransportSystemDataGenerator {
         var maxLengthConveyor = transportSystem.conveyors.stream()
                 .max(Comparator.comparingDouble(ConveyorDataGenerator::getLength))
                 .orElse(null);
-        var ksiColumn = createColumn(Constants.ColumnsNames.KSI, locale, cellFormat, maxLengthConveyor.getInitialDensity().keys());
+        var ksiColumn = CsvWriterP.createColumn(Constants.ColumnsNames.KSI, locale, cellFormat, maxLengthConveyor.getInitialDensity().keys());
         table.add(ksiColumn);
 
         transportSystem.conveyors.forEach(conveyor ->
                 table.add(
-                        createColumn(
+                        CsvWriterP.createColumn(
                                 Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.INITIAL_DENSITY),
                                 locale, cellFormat, conveyor.getInitialDensity().values())
                 )
@@ -79,23 +79,23 @@ public class TransportSystemDataGenerator {
                         (conveyor.getInputFlow() != null) ? conveyor.getInputFlow().size() : 0
                 ))
                 .orElse(null);
-        var tauColumn = createColumn(Constants.ColumnsNames.TAU, locale, cellFormat, maxTauConveyor.getInputFlow().keys());
+        var tauColumn = CsvWriterP.createColumn(Constants.ColumnsNames.TAU, locale, cellFormat, maxTauConveyor.getInputFlow().keys());
         table.add(tauColumn);
 
         transportSystem.conveyors.forEach(conveyor -> {
                     if (Objects.nonNull(conveyor.getInputFlow())) {
                         table.add(
-                                createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.INPUT_FLOW), locale, cellFormat, conveyor.getInputFlow().values())
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.JsonParametersNames.INPUT_FLOW), locale, cellFormat, conveyor.getInputFlow().values())
                         );
                     }
                     if (Objects.nonNull(conveyor.getBunkerOutputFlow())) {
                         table.add(
-                                createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.BUNKER_OUTPUT_FLOW), locale, cellFormat, conveyor.getBunkerOutputFlow().values())
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.BUNKER_OUTPUT_FLOW), locale, cellFormat, conveyor.getBunkerOutputFlow().values())
                         );
                     }
                     if (Objects.nonNull(conveyor.getSpeed())) {
                         table.add(
-                                createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.SPEED), locale, cellFormat, conveyor.getSpeed().values())
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.SPEED), locale, cellFormat, conveyor.getSpeed().values())
                         );
                     }
                     if (Objects.nonNull(conveyor.getConveyorNode())) {
@@ -103,7 +103,7 @@ public class TransportSystemDataGenerator {
 
                         keys.forEach(key ->
                                 table.add(
-                                        createColumn(
+                                        CsvWriterP.createColumn(
                                                 Constants.ColumnsNames.generateHeader(
                                                         conveyor.getId(), Constants.JsonParametersNames.CONVEYOR_NODE, key
                                                 ),
@@ -121,20 +121,6 @@ public class TransportSystemDataGenerator {
         var csvWriterP = new CsvWriterP("12.1", ';', file.getParent(), file.getName());
         csvWriterP.writeToFile(transposeTable);
         System.out.println(transportSystem);
-    }
-
-    private static List<String> createColumn(String header, Locale locale, String cellFormat, Collection<Double> values) {
-        var column = new ArrayList<String>();
-        column.add(FormatUtil.getString(locale, header, cellFormat, header));
-        values.forEach(value -> column.add(
-                FormatUtil.getString(
-                        locale,
-                        String.format(locale, cellFormat, value),
-                        cellFormat,
-                        header
-                )
-        ));
-        return column;
     }
 
     public static void main(String[] args) throws IOException {

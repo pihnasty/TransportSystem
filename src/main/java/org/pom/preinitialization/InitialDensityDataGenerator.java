@@ -28,7 +28,7 @@ public class InitialDensityDataGenerator extends InitialDensity {
 
     public void init(double deltaLength, double length) {
         var densityMap = super.getDensityMap();
-        for (double x = 0.0; x< length; x+=deltaLength) {
+        for (double x = 0.0; x< length + deltaLength; x+=deltaLength) {
             densityMap.put(x, func.valueOf(x));
         }
     }

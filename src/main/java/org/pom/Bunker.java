@@ -3,11 +3,13 @@ package org.pom;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.pom.utils.MathUtil;
 import org.pom.utils.MessagesUtil;
 import org.pom.utils.ParametersValidator;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,10 +29,11 @@ public class Bunker {
     private final double densityOverMaxCapacity;
     private final double minAvailableCapacity;
     private final double maxAvailableCapacity;
+    @Getter
     private final double maxAvailableOutput;
 
     /**
-     * Constructs a {@code Bunker} with specified parameters.
+     * Constructs a Bunker with specified parameters.
      *
      * @param capacity               The initial capacity of the bunker.
      * @param bunkerOverMaxCapacity  The initial capacity of the bunker overflow.
@@ -63,14 +66,10 @@ public class Bunker {
                 capacity, maxCapacity, minAvailableCapacity, maxAvailableCapacity, maxAvailableOutput);
     }
 
-    /**
-     * Adds parameter values for a specific time point (tau).
-     *
-     * @param tau    The time at which the parameters are being recorded.
-     * @param input  The input flow from bunker at time {@code tau}.
-     * @param output The output flow from bunker at time {@code tau}.
-     * @throws IllegalArgumentException If {@code tau}, {@code input}, or {@code output} is negative.
-     */
+    public Collection<Double> getValues(String key) {
+        return tauToBunkerParametersMap.values().stream().map(params -> params.get(key)).toList();
+    }
+
     public void addParametersValues(double tau, double input, double output, double outputForMaxDensity) {
         ParametersValidator.validateNonNegativeKeyValue(
                 "Bunker", Map.of("tau", tau, "input", input,
@@ -92,7 +91,7 @@ public class Bunker {
      * @return The input flow rate at time {@code tau}.
      */
     public double getInputFlowAtTau(double tau) {
-        return getParameterAtTau(Constants.BUNKER_INPUT_FLOW, tau);
+        return getParameterAtTau(Constants.ColumnsNames.BUNKER_INPUT_FLOW, tau);
     }
 
     /**
@@ -102,7 +101,7 @@ public class Bunker {
      * @return The output real flow at time {@code tau}.
      */
     public double getOutputRealFlowFromBunker(double tau) {
-        return getParameterAtTau(Constants.BUNKER_REAL_OUTPUT_FLOW, tau);
+        return getParameterAtTau(Constants.ColumnsNames.BUNKER_REAL_OUTPUT_FLOW, tau);
     }
 
     /**
@@ -112,7 +111,7 @@ public class Bunker {
      * @return The output flow at time {@code tau} using max density restriction.
      */
     public double getOutputFlowFromBunkerToConveyorBelt(double tau) {
-        return getParameterAtTau(Constants.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW, tau);
+        return getParameterAtTau(Constants.ColumnsNames.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW, tau);
     }
 
     /**
@@ -123,7 +122,7 @@ public class Bunker {
      */
     public double getCapacityAtTau(double tau) {
         log.debug("Retrieving capacity for tau: {}", tau);
-        return getParameterAtTau(Constants.BUNKER_CAPACITY, tau);
+        return getParameterAtTau(Constants.ColumnsNames.BUNKER_CAPACITY, tau);
     }
 
     /**
@@ -133,7 +132,7 @@ public class Bunker {
      * @return The over-capacity deviation at time {@code tau}.
      */
     public double getOverMaxCapacityAtTau(double tau) {
-        return getParameterAtTau(Constants.BUNKER_OVER_MAX_CAPACITY, tau);
+        return getParameterAtTau(Constants.ColumnsNames.BUNKER_OVER_MAX_CAPACITY, tau);
     }
 
     /**
@@ -143,7 +142,7 @@ public class Bunker {
      * @return The under-capacity deviation at time {@code tau}.
      */
     public double getDensityOverMaxCapacityAtTau(double tau) {
-        return getParameterAtTau(Constants.DENSITY_OVER_MAX_CAPACITY, tau);
+        return getParameterAtTau(Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY, tau);
     }
 
     /**
@@ -170,8 +169,8 @@ public class Bunker {
     }
 
     private Double correctedConveyorBeltBunkerOutputFlow(Map<String, Double> lastEntry, double output,double outputForMaxDensity) {
-        lastEntry.put(Constants.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW, Math.min(output, outputForMaxDensity));
-        return lastEntry.get(Constants.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW);
+        lastEntry.put(Constants.ColumnsNames.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW, Math.min(output, outputForMaxDensity));
+        return lastEntry.get(Constants.ColumnsNames.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW);
     }
 
     /**
@@ -182,20 +181,20 @@ public class Bunker {
         var lastEntry = this.tauToBunkerParametersMap.lastEntry().getValue();
         var deltaTau = tau - tauToBunkerParametersMap.lastEntry().getKey();
 
-        var lastInputFlow = lastEntry.get(Constants.BUNKER_INPUT_FLOW);
-        var lastCapacity = lastEntry.get(Constants.BUNKER_CAPACITY);
+        var lastInputFlow = lastEntry.get(Constants.ColumnsNames.BUNKER_INPUT_FLOW);
+        var lastCapacity = lastEntry.get(Constants.ColumnsNames.BUNKER_CAPACITY);
         var lastRealOutputFlow
                 = correctedLastRealFlow(lastEntry, lastCapacity, lastInputFlow, maxDensityOutputFlow, deltaTau);
         var lastOnConveyorBeltBunkerOutputFlow
                 = correctedConveyorBeltBunkerOutputFlow(lastEntry, lastRealOutputFlow, maxDensityOutputFlow);
 
-        var predictCapacity = lastCapacity + (lastInputFlow - lastRealOutputFlow) * deltaTau;
+        var predictCapacity = calculateCapacity(lastCapacity, lastInputFlow, deltaTau, lastRealOutputFlow);
         var capacity = calculateLimitedCapacity(predictCapacity);
         var overMaxCapacity = calculateOverMaxCapacity(
-                lastEntry.get(Constants.BUNKER_OVER_MAX_CAPACITY), maxCapacity, predictCapacity
+                lastEntry.get(Constants.ColumnsNames.BUNKER_OVER_MAX_CAPACITY), maxCapacity, predictCapacity
         );
         var densityOverMaxCapacity = calculateDensityOverMaxCapacity(
-                lastEntry.get(Constants.DENSITY_OVER_MAX_CAPACITY),
+                lastEntry.get(Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY),
                 lastRealOutputFlow,
                 lastOnConveyorBeltBunkerOutputFlow,
                 deltaTau
@@ -211,25 +210,32 @@ public class Bunker {
             double capacity, double overMaxCapacity, double densityOverMaxCapacity
     ) {
         var bunkerParameters = new HashMap<String, Double>();
-        bunkerParameters.put(Constants.BUNKER_INPUT_FLOW, input);
-        bunkerParameters.put(Constants.BUNKER_PLANED_OUTPUT_FLOW, planedOutput);
-        bunkerParameters.put(Constants.BUNKER_CAPACITY, capacity);
-        bunkerParameters.put(Constants.BUNKER_OVER_MAX_CAPACITY, overMaxCapacity);
-        bunkerParameters.put(Constants.DENSITY_OVER_MAX_CAPACITY, densityOverMaxCapacity);
-        bunkerParameters.put(Constants.BUNKER_REAL_OUTPUT_FLOW, lastRealFlow);
-        bunkerParameters.put(Constants.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW, lastOnConveyorBeltBunkerOutputFlow);
+        bunkerParameters.put(Constants.ColumnsNames.BUNKER_INPUT_FLOW, input);
+        bunkerParameters.put(Constants.ColumnsNames.BUNKER_PLANED_OUTPUT_FLOW, planedOutput);
+        bunkerParameters.put(Constants.ColumnsNames.BUNKER_CAPACITY, capacity);
+        bunkerParameters.put(Constants.ColumnsNames.BUNKER_OVER_MAX_CAPACITY, overMaxCapacity);
+        bunkerParameters.put(Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY, densityOverMaxCapacity);
+        bunkerParameters.put(Constants.ColumnsNames.BUNKER_REAL_OUTPUT_FLOW, lastRealFlow);
+        bunkerParameters.put(Constants.ColumnsNames.CONVEYOR_BELT_BUNKER_OUTPUT_FLOW, lastOnConveyorBeltBunkerOutputFlow);
         return bunkerParameters;
     }
 
     private Double correctedLastRealFlow(
             Map<String, Double> lastEntry, double lastCapacity, double lastInputFlow, double maxDensityOutputFlow, double deltaTau) {
-        var lastPlanedOutputFlow = lastEntry.get(Constants.BUNKER_PLANED_OUTPUT_FLOW);
+        var lastPlanedOutputFlow = lastEntry.get(Constants.ColumnsNames.BUNKER_PLANED_OUTPUT_FLOW);
         var limitedLastPlanedOutputFlow = calculateLimitedPlanedOutput(lastPlanedOutputFlow);
 
-        var capacity = lastCapacity + (lastInputFlow - limitedLastPlanedOutputFlow) * deltaTau;
+        var capacity = calculateCapacity(lastCapacity, lastInputFlow, deltaTau, limitedLastPlanedOutputFlow);
         var lastRealOutputFlow = calculateRealOutput(limitedLastPlanedOutputFlow, capacity / deltaTau);
-        lastEntry.put(Constants.BUNKER_REAL_OUTPUT_FLOW, lastRealOutputFlow);
-        return lastEntry.get(Constants.BUNKER_REAL_OUTPUT_FLOW);
+        lastEntry.put(Constants.ColumnsNames.BUNKER_REAL_OUTPUT_FLOW, lastRealOutputFlow);
+        return lastEntry.get(Constants.ColumnsNames.BUNKER_REAL_OUTPUT_FLOW);
+    }
+
+    private static double calculateCapacity(double lastCapacity,
+                                            double lastInputFlow,
+                                            double deltaTau,
+                                            double limitedLastPlanedOutputFlow) {
+        return Math.max(lastCapacity + (lastInputFlow - limitedLastPlanedOutputFlow) * deltaTau, 0.0);
     }
 
     private double calculateLimitedCapacity(double currentCapacity) {

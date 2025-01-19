@@ -2,6 +2,11 @@ plugins {
     id("java")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 group = "org.pom"
 version = "1.0-SNAPSHOT"
 
@@ -18,8 +23,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     // Lombok dependency
-    compileOnly("org.projectlombok:lombok:1.18.28")
-    annotationProcessor("org.projectlombok:lombok:1.18.28")
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
 
     // SLF4J (required for Lombok's logging annotations)
     implementation("org.slf4j:slf4j-api:2.0.0") // Adjust version if necessary
@@ -32,8 +37,8 @@ dependencies {
     implementation("org.yaml:snakeyaml:2.0")
 
     // For tests, if Lombok is used in test code
-    testCompileOnly("org.projectlombok:lombok:1.18.28")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.28")
+    testCompileOnly("org.projectlombok:lombok:1.18.30")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 
     // Mockito dependencies
     testImplementation("org.mockito:mockito-core:5.5.0")

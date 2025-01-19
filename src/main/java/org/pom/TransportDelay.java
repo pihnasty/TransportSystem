@@ -71,14 +71,12 @@ public class TransportDelay {
 
     /**
      * Calculates the difference in distance between the specified tau and the starting tau.
-     * <p>
-     * This method retrieves the distance associated with the given delay {@code tau} and subtracts
+     * This method retrieves the distance associated with the given delay tau and subtracts
      * the distance corresponding to the first (earliest) tau in the mapping. The result
      * represents the delta distance relative to the starting point.
-     * </p>
      *
      * @param tau the tau for which the delta distance is calculated.
-     * @return the difference in distance between {@code tau} and the starting tau.
+     * @return the difference in distance between tau and the starting tau.
      */
     public Double getDeltaDistanceFromStart(double tau) {
         return MathUtil.getValueByKey(distanceToDelay, tau) - distanceToDelay.firstEntry().getValue();

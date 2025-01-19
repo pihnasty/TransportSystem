@@ -8,11 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.pom.utils.MathUtil;
 import org.pom.utils.ParametersValidator;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+
 @Slf4j
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Density {
+public class Density implements KeysValuesProvider<Double> {
     @Getter
     private final double maxAvailableDensity;
     private final TreeMap<Double, Double> tauToDensityMap;
@@ -41,14 +41,24 @@ public class Density {
 
     private void validateValues(double tau, double density) {
         ParametersValidator.validateNonNegativeKeyValue(
-                "Density", Map.of(Constants.TAU, tau, Constants.DENSITY, density)
+                "Density", Map.of(Constants.TAU, tau, Constants.ColumnsNames.DENSITY, density)
         );
         ParametersValidator.validateMaxValue(
-                "density", density, maxAvailableDensity, Map.of(Constants.TAU, tau, Constants.DENSITY, density)
+                "density", density, maxAvailableDensity, Map.of(Constants.TAU, tau, Constants.ColumnsNames.DENSITY, density)
         );
     }
 
     private double getParameterAtTau(double tau) {
         return MathUtil.getValueByKey(tauToDensityMap, tau);
+    }
+
+    @Override
+    public Collection<Double> values() {
+        return Collections.unmodifiableCollection(tauToDensityMap.values());
+    }
+
+    @Override
+    public Collection<Double> keys() {
+        return Collections.unmodifiableCollection(tauToDensityMap.keySet());
     }
 }

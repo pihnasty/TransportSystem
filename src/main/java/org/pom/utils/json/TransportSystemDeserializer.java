@@ -59,7 +59,7 @@ public class TransportSystemDeserializer extends StdDeserializer<TransportSystem
                 }
 
                 var inputFlowValues = extractRowByName(
-                        Constants.ColumnsNames.generateHeader(conveyorId, Constants.ColumnsNames.INPUT_FLOW),
+                        Constants.ColumnsNames.generateHeader(conveyorId, Constants.JsonParametersNames.INPUT_FLOW),
                         transposeTable);
                 if (inputFlowValues != null) {
                     conveyor.getInputFlow().setValues(convertToTreeMap(taus, inputFlowValues));
