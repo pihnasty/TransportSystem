@@ -2,14 +2,15 @@ package org.pom.preinitialization;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.NoArgsConstructor;
 import org.pom.InputFlow;
 import org.pom.utils.functions.Func;
 import org.pom.utils.functions.FunctionFactory;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 
+@NoArgsConstructor(force = true)
 public class InputFlowDataGenerator extends InputFlow {
     private final String functionName;
     private final Map<String, Double> parameters;

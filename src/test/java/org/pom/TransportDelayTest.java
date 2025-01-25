@@ -13,10 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TransportDelayTest {
 
     private static TransportDelay transportDelay;
+    private static double CONVEYOR_LENGTH =1.0;
 
     @BeforeAll
     static void setUp() {
-        transportDelay = new TransportDelay();
+        transportDelay = new TransportDelay(CONVEYOR_LENGTH);
         for (double tau = 0.0; tau < 1.0; tau += 0.0001) {
             var speed = 1.0 +tau;
             transportDelay.addParametersValues(tau, speed);
@@ -26,21 +27,21 @@ class TransportDelayTest {
     @Test
     void testAddDistanceValue_ValidParameters() {
         // Add a valid distance value and ensure no exceptions occur
-        var localTransportDelay = new TransportDelay();
+        var localTransportDelay = new TransportDelay(CONVEYOR_LENGTH);
         assertDoesNotThrow(() -> localTransportDelay.addParametersValues(5.0, 10.0));
     }
 
     @Test
     void testAddDistanceValue_InvalidParameters() {
         // Attempt to add invalid parameters and ensure the appropriate exception is thrown
-        var localTransportDelay = new TransportDelay();
+        var localTransportDelay = new TransportDelay(CONVEYOR_LENGTH);
         assertThrows(IllegalArgumentException.class, () ->  localTransportDelay.addParametersValues(-5.0, 10.0));
         assertThrows(IllegalArgumentException.class, () ->  localTransportDelay.addParametersValues(5.0, -10.0));
     }
 
     @Test
     void testGetDelayByDistance_SimpleCase() {
-        var delay = transportDelay.getDelayByDeltaDistance(1.0);
+        var delay = transportDelay.getDelayByDeltaDistance(CONVEYOR_LENGTH);
         assertNotNull(delay);
         assertTrue(delay > 0); // Verify a reasonable delay
     }

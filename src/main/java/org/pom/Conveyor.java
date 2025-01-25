@@ -25,10 +25,10 @@ public class Conveyor {
     private final OutputFlow outputFlow;
     private final Density density;
     private final InputFlow inputFlow;
-    private BunkerOutputFlow bunkerOutputFlow;
+    private final BunkerOutputFlow bunkerOutputFlow;
     @Setter
     private InitialDensity initialDensity;
-    private int id;
+    private final int id;
 
     @JsonCreator
     public Conveyor(
@@ -45,7 +45,7 @@ public class Conveyor {
         this.bunker = bunker;
         this.speed = speed;
         this.length = length;
-        this.transportDelay = new TransportDelay();
+        this.transportDelay = new TransportDelay(length);
         this.inputFlow = Objects.isNull(inputFlow) ? new InputFlow() : inputFlow;
         this.bunkerOutputFlow = bunkerOutputFlow;
         this.initialDensity = initialDensity;
@@ -57,10 +57,9 @@ public class Conveyor {
     public void addParametersValues(double tau,double bunkerInput,double planedBunkerOutput,double speed) {
         this.bunker.addParametersValues(tau, bunkerInput, planedBunkerOutput, density.getMaxAvailableDensity() * speed);
         this.speed.addParametersValues(tau, speed);
-        this.transportDelay.addParametersValues(tau, speed);
         this.density.addParametersValues(tau, calculateDensity(tau, speed));
-        var delayTau = this.transportDelay.getDelayByDeltaDistance(this.length);
-        this.outputFlow.addOutputFlowValue(tau, delayTau);
+        this.transportDelay.addParametersValues(tau, speed);
+        this.outputFlow.addOutputFlowValue(tau, this.transportDelay.getDelayForConveyorLength());
     }
 
     /**

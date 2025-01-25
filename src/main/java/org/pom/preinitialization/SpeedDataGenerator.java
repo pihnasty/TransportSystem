@@ -2,7 +2,6 @@ package org.pom.preinitialization;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.pom.InputFlow;
 import org.pom.Speed;
 import org.pom.utils.functions.Func;
 import org.pom.utils.functions.FunctionFactory;

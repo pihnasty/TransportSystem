@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.pom.*;
 
-import java.util.Map;
 import java.util.Objects;
 
 
 public class ConveyorDataGenerator extends Conveyor {
+    InputFlowDataGenerator inputFlow;
     @JsonCreator
     public ConveyorDataGenerator(
-            @JsonProperty("id") int id,
+            @JsonProperty(Constants.JsonParametersNames.ID) int id,
             @JsonProperty("bunker") Bunker bunker,
             @JsonProperty("density") Density density,
             @JsonProperty("speed") SpeedDataGenerator speed,
@@ -20,7 +20,10 @@ public class ConveyorDataGenerator extends Conveyor {
             @JsonProperty("initialDensity") InitialDensityDataGenerator initialDensity,
             @JsonProperty(Constants.JsonParametersNames.CONVEYOR_NODE) ConveyorNodeDataGenerator conveyorNodeDataGenerator,
             @JsonProperty("length") double length) {
-        super(id, bunker, density, speed, inputFlow, bunkerOutputFlow, initialDensity, conveyorNodeDataGenerator, length);
+        super(id, bunker, density, speed,
+                Objects.isNull(inputFlow) ? new InputFlowDataGenerator() : inputFlow,
+                bunkerOutputFlow, initialDensity, conveyorNodeDataGenerator, length);
+        this.inputFlow = inputFlow;
     }
 
     public void createInitialDensity(double deltaLength) {

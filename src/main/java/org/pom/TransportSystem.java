@@ -160,6 +160,11 @@ public class TransportSystem {
                                 )
                         );
                     }
+                    if (Objects.nonNull(conveyor.getTransportDelay())) {
+                        table.add(
+                                CsvWriterP.createColumn(Constants.ColumnsNames.generateHeader(conveyor.getId(), Constants.ColumnsNames.DELAY_FOR_CONVEYOR_LENGTH), locale, cellFormat, conveyor.getTransportDelay().values())
+                        );
+            }
                 }
         );
 

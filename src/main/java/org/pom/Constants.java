@@ -20,6 +20,7 @@ public class Constants {
         public final static String CONVEYOR_BELT_BUNKER_OUTPUT_FLOW = "conveyor-belt-bunker-output-flow";
         public final static String DENSITY = "density";
         public final static String DENSITY_OVER_MAX_CAPACITY = "density-over-max-capacity";
+        public final static String DELAY_FOR_CONVEYOR_LENGTH = "delayForConveyorLength";
         public final static String INITIAL_DENSITY = "initialDensity";
         public final static String INPUT_FLOW = JsonParametersNames.INPUT_FLOW;
         public final static String KSI = "ksi";

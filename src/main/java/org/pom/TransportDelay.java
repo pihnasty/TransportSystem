@@ -4,8 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pom.utils.MathUtil;
 import org.pom.utils.ParametersValidator;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The {@code TransportDelay} class models the relationship between delay and distance
@@ -19,18 +18,22 @@ import java.util.TreeMap;
  * <p>The class logs debug information using SLF4J.</p>
  */
 @Slf4j
-public class TransportDelay {
+public class TransportDelay implements KeysValuesProvider<Double> {
 
+    private final double conveyorLength;
     private final TreeMap<Double, Map<String, Double>> delayToDistance;
     private final TreeMap<Double, Double> distanceToDelay;
+    private final TreeMap<Double, Double> delayForConveyorLength;
 
     /**
      * Constructs an empty {@code TransportDelay} object with an initialized
      * {@link TreeMap} for managing delay-to-distance mappings.
      */
-    public TransportDelay() {
+    public TransportDelay(double conveyorLength) {
+        this.conveyorLength = conveyorLength;
         this.delayToDistance = new TreeMap<>();
         this.distanceToDelay = new TreeMap<>();
+        this.delayForConveyorLength = new TreeMap<>();
     }
 
     /**
@@ -49,6 +52,7 @@ public class TransportDelay {
         var distance = calculateDistance(tau);
         delayToDistance.put(distance, Map.of(Constants.TAU, tau, Constants.SPEED, speed));
         distanceToDelay.put(tau, distance);
+        delayForConveyorLength.put(tau,getDelayByDeltaDistance(conveyorLength));
         log.debug("Distance value added. Distance: {}, Tau: {}, Speed: {}", distance, tau, speed);
     }
 
@@ -69,6 +73,11 @@ public class TransportDelay {
                 - MathUtil.getValueByKey(delayToDistance, distance).get(Constants.TAU);
     }
 
+    public Double getDelayForConveyorLength() {
+        return delayForConveyorLength.lastEntry().getValue();
+    }
+
+
     /**
      * Calculates the difference in distance between the specified tau and the starting tau.
      * This method retrieves the distance associated with the given delay tau and subtracts
@@ -88,5 +97,15 @@ public class TransportDelay {
                 : delayToDistance.lastKey() +
                 delayToDistance.lastEntry().getValue().get(Constants.SPEED) *
                         (tau - delayToDistance.lastEntry().getValue().get(Constants.TAU));
+    }
+
+    @Override
+    public Collection<Double> values() {
+        return Collections.unmodifiableCollection(delayForConveyorLength.values());
+    }
+
+    @Override
+    public Collection<Double> keys() {
+        return Collections.unmodifiableCollection(delayForConveyorLength.keySet());
     }
 }
