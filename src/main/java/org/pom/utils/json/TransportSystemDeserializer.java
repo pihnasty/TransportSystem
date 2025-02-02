@@ -1,5 +1,6 @@
 package org.pom.utils.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TransportSystemDeserializer extends StdDeserializer<TransportSystem> {
 
     private final Locale locale;
@@ -35,6 +37,7 @@ public class TransportSystemDeserializer extends StdDeserializer<TransportSystem
         ObjectMapper mapper = (ObjectMapper) p.getCodec();
         JsonNode root = mapper.readTree(p);
         String initDataPath = root.get("initDataPath").asText();
+        String outputDataPath = root.get("outputDataPath").asText();
 
         File file = new File(initDataPath);
         CsvReaderP csvReaderP = new CsvReaderP("%8.3f ", ';',file.getParent(), file.getName());
@@ -104,7 +107,7 @@ public class TransportSystemDeserializer extends StdDeserializer<TransportSystem
         TransportSystem transportSystem
                 = new TransportSystem(
                 new ArrayList<>(conveyors.values()),
-                        initDataPath,
+                        initDataPath,outputDataPath,
                 root.get("researchTau").asDouble(),
                 root.get("deltaTau").asDouble(),
                 root.get("deltaLength").asDouble()

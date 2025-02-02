@@ -56,29 +56,29 @@ class BunkerTest {
         }
     }
 
-//    @Test
-//    void testAddParameters_validOutputRealFlowFromBunker() {
-//        for (var tau : taus) {
-//            log.info("tau : {}, bunkerRealOutputFlows: {}, bunker.getOutputRealFlowFromBunker: {}",tau, bunkerRealOutputFlows.get(taus.indexOf(tau)), bunker.getOutputRealFlowFromBunker(tau));
-//            assertEquals(bunkerRealOutputFlows.get(taus.indexOf(tau)), bunker.getOutputRealFlowFromBunker(tau));
-//        }
-//    }
+    @Test
+    void testAddParameters_validOutputRealFlowFromBunker() {
+        for (var tau : taus) {
+            log.info("tau : {}, bunkerRealOutputFlows: {}, bunker.getOutputRealFlowFromBunker: {}",tau, bunkerRealOutputFlows.get(taus.indexOf(tau)), bunker.getOutputRealFlowFromBunker(tau));
+            assertEquals(bunkerRealOutputFlows.get(taus.indexOf(tau)), bunker.getOutputRealFlowFromBunker(tau));
+        }
+    }
 
-//    @Test
-//    void testAddParameters_validOutputFlowFromBunkerToConveyorBelt() {
-//        for (var tau : taus) {
-//            log.info("tau : {}, validFlowFromBunkerToConveyorBelt: {}, bunker.getOutputFlowFromBunkerToConveyorBelt: {}",tau, validFlowFromBunkerToConveyorBelt.get(taus.indexOf(tau)), bunker.getOutputFlowFromBunkerToConveyorBelt(tau));
-//            assertEquals(validFlowFromBunkerToConveyorBelt.get(taus.indexOf(tau)), bunker.getOutputFlowFromBunkerToConveyorBelt(tau));
-//        }
-//    }
+    @Test
+    void testAddParameters_validOutputFlowFromBunkerToConveyorBelt() {
+        for (var tau : taus) {
+            log.info("tau : {}, validFlowFromBunkerToConveyorBelt: {}, bunker.getOutputFlowFromBunkerToConveyorBelt: {}",tau, validFlowFromBunkerToConveyorBelt.get(taus.indexOf(tau)), bunker.getOutputFlowFromBunkerToConveyorBelt(tau));
+            assertEquals(validFlowFromBunkerToConveyorBelt.get(taus.indexOf(tau)), bunker.getOutputFlowFromBunkerToConveyorBelt(tau));
+        }
+    }
 
-//    @Test
-//    void testAddParameters_validBelowMinCapacities() {
-//        for (var tau : taus) {
-//            log.info("tau : {}, validBelowMinCapacities: {}, bunker.getDensityOverMaxCapacityAtTau: {}",tau, validDensityOverMaxCapacities.get(taus.indexOf(tau)), bunker.getDensityOverMaxCapacityAtTau(tau));
-//            assertEquals(validDensityOverMaxCapacities.get(taus.indexOf(tau)), bunker.getDensityOverMaxCapacityAtTau(tau));
-//        }
-//    }
+    @Test
+    void testAddParameters_validBelowMinCapacities() {
+        for (var tau : taus) {
+            log.info("tau : {}, validBelowMinCapacities: {}, bunker.getDensityOverMaxCapacityAtTau: {}",tau, validDensityOverMaxCapacities.get(taus.indexOf(tau)), bunker.getDensityOverMaxCapacityAtTau(tau));
+            assertEquals(validDensityOverMaxCapacities.get(taus.indexOf(tau)), bunker.getDensityOverMaxCapacityAtTau(tau));
+        }
+    }
 
     @Test
     void testAddParameters_validOverMaxCapacities() {

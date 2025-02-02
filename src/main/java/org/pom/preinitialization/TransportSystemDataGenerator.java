@@ -1,6 +1,7 @@
 package org.pom.preinitialization;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TransportSystemDataGenerator {
     private List<ConveyorDataGenerator> conveyors;
     private final String initDataPath;
@@ -117,7 +118,7 @@ public class TransportSystemDataGenerator {
 
         var transposeTable = MathUtil.transposeMatrix(table," "::repeat);
         File file = new File(transportSystem.initDataPath);
-        var csvWriterP = new CsvWriterP("12.1", ';', file.getParent(), file.getName());
+        var csvWriterP = new CsvWriterP(cellFormat, ';', file.getParent(), file.getName());
         csvWriterP.writeToFile(transposeTable);
         System.out.println(transportSystem);
     }

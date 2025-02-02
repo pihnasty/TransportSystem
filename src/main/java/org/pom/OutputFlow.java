@@ -30,9 +30,9 @@ public class OutputFlow implements KeysValuesProvider<Double> {
     /**
      * Constructs an OutputFlow object with the specified dependencies.
      *
-     * @param bunker         The bunker for output flow data.json.
-     * @param speed          The speed for speed data.json.
-     * @param initialDensity The initialDensity for density data.json.
+     * @param bunker         The bunker for output flow data2.json.
+     * @param speed          The speed for speed data2.json.
+     * @param initialDensity The initialDensity for density data2.json.
      * @param transportDelay The TransportDelay for delay mappings.
      */
     public OutputFlow(Bunker bunker, Speed speed, InitialDensity initialDensity, TransportDelay transportDelay) {

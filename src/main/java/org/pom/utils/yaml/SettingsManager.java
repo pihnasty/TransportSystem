@@ -11,7 +11,7 @@ import java.util.Locale;
 
 public class SettingsManager {
 
-    private static final String SETTINGS_FILE = "settings.yaml";
+    private static final String SETTINGS_FILE = "settings2.yaml";
     private Settings settings;
 
     public SettingsManager() {
@@ -21,9 +21,9 @@ public class SettingsManager {
     // Load settings from YAML file
     public void loadSettings() {
         Yaml yaml = new Yaml();
-        try (InputStream inputStream = SettingsManager.class.getClassLoader().getResourceAsStream("settings.yaml")) {
+        try (InputStream inputStream = SettingsManager.class.getClassLoader().getResourceAsStream("settings2.yaml")) {
             if (inputStream == null) {
-                throw new RuntimeException("settings.yaml not found in resources");
+                throw new RuntimeException("settings2.yaml not found in resources");
             }
             settings = yaml.loadAs(inputStream, Settings.class); //yaml.load(inputStream);
             System.out.println(settings);  // Print loaded YAML content

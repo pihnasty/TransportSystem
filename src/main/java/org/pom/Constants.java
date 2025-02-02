@@ -46,5 +46,6 @@ public class Constants {
         public final static String INIT_DATA_PATH = "initDataPath";
         public final static String INPUT_FLOW = "inputFlow";
         public final static String RESEARCH_TAU = "researchTau";
+        public final static String OUTPUT_DATA_PATH = "outputDataPath";
     }
 }

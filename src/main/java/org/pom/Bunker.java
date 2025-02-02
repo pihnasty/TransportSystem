@@ -225,8 +225,7 @@ public class Bunker {
         var lastPlanedOutputFlow = lastEntry.get(Constants.ColumnsNames.BUNKER_PLANED_OUTPUT_FLOW);
         var limitedLastPlanedOutputFlow = calculateLimitedPlanedOutput(lastPlanedOutputFlow);
 
-        var capacity = calculateCapacity(lastCapacity, lastInputFlow, deltaTau, limitedLastPlanedOutputFlow);
-        var lastRealOutputFlow = calculateRealOutput(limitedLastPlanedOutputFlow, capacity / deltaTau);
+        var lastRealOutputFlow = calculateRealOutput(limitedLastPlanedOutputFlow,lastInputFlow + lastCapacity / deltaTau);
         lastEntry.put(Constants.ColumnsNames.BUNKER_REAL_OUTPUT_FLOW, lastRealOutputFlow);
         return lastEntry.get(Constants.ColumnsNames.BUNKER_REAL_OUTPUT_FLOW);
     }
@@ -242,17 +241,8 @@ public class Bunker {
         return Math.min(Math.max(currentCapacity, minCapacity), maxCapacity);
     }
 
-    /**
-     * This method analysed required flow (Fr) and max available flow (Fa).
-     * Fa=Fr+deltaOutput.
-     * If Fa<Fr (It means, that deltaOutput<0), then real flow will be less (output + deltaOutput < output),
-     * because capacity absent.
-     * @param output The planed output flow from bunker at time {@code tau}.
-     * @param deltaOutput The additional output flow from bunker using predict capacity.
-     * @return The real output flow from bunker
-     */
-    private static double calculateRealOutput(double output, double deltaOutput) {
-        return deltaOutput > 0 ? output : output + deltaOutput;
+    private static double calculateRealOutput(double limitedPlanedOutputFlow, double maxOutputForCurrentCapacity) {
+        return Math.min(limitedPlanedOutputFlow, maxOutputForCurrentCapacity);
     }
 
     private double calculateOverMaxCapacity(double previousCapacity, double maxCapacity, double currentCapacity) {

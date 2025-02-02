@@ -2,7 +2,7 @@ app:
   name: MyApp
   version: 1.0.0
   locale: Locale.US
-  initTransportSystemFile: "E:\\A\\TransportSystem\\src\\main\\resources\\data.json"
+  initTransportSystemFile: "E:\\A\\TransportSystem\\src\\main\\resources\\project\\data.json"
 
 prepareDataTableFormat:
   minWidth: 10

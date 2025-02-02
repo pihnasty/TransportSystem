@@ -29,6 +29,8 @@ public class TransportSystem {
     private final List<Conveyor> inputConveyors = new ArrayList<>();
     @Getter
     private String initDataPath;
+    @Getter
+    private String outputDataPath;
     private final double researchTau;
     private final double deltaTau;
     @Getter
@@ -42,10 +44,12 @@ public class TransportSystem {
     public TransportSystem(
             @JsonProperty(Constants.JsonParametersNames.CONVEYORS) List<Conveyor> conveyors,
             @JsonProperty(Constants.JsonParametersNames.INIT_DATA_PATH) String initDataPath,
+            @JsonProperty(Constants.JsonParametersNames.OUTPUT_DATA_PATH) String outputDataPath,
             @JsonProperty(Constants.JsonParametersNames.RESEARCH_TAU) double researchTau,
             @JsonProperty(Constants.JsonParametersNames.DELTA_TAU) double deltaTau,
             @JsonProperty(Constants.JsonParametersNames.DELTA_LENGTH) double deltaLength) {
         this.initDataPath = initDataPath;
+        this.outputDataPath = outputDataPath;
         this.researchTau = researchTau;
         this.deltaTau = deltaTau;
         this.deltaLength = deltaLength;
@@ -74,16 +78,17 @@ public class TransportSystem {
     }
 
     public void createTransportSystem() {
-        var initTransportSystemFile = this.settingsManager.getApp().getInitTransportSystemFile();
+        var initTransportSystemFiles = this.settingsManager.getApp().getInitTransportSystemFile();
         ObjectMapper objectMapper = ObjectMapperFactory.createTransportSystemMapper();
         TransportSystem transportSystem = null;
         try {
-            transportSystem = objectMapper.readValue(new File(initTransportSystemFile), TransportSystem.class);
+            transportSystem = objectMapper.readValue(new File(initTransportSystemFiles), TransportSystem.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
         conveyors = transportSystem.getConveyors();
         initDataPath = transportSystem.getInitDataPath();
+        outputDataPath = transportSystem.getOutputDataPath();
     }
 
     public void processingTransportSystem() {
@@ -100,6 +105,8 @@ public class TransportSystem {
         var cellFormat = settingsManager.getPrepareDataTableFormat().getCellFormat();
         var locale = settingsManager.getApp().getLocale();
         var table = new ArrayList<List<String>>();
+        var tauColumn = CsvWriterP.createColumn(Constants.ColumnsNames.TAU, locale, cellFormat, taus);
+        table.add(tauColumn);
         conveyors.forEach(conveyor -> {
                     if (Objects.nonNull(conveyor.getInputFlow())) {
                         table.add(
@@ -169,8 +176,8 @@ public class TransportSystem {
         );
 
         var transposeTable = MathUtil.transposeMatrix(table," "::repeat);
-        File file = new File(initDataPath);
-        var csvWriterP = new CsvWriterP("12.1", ';', file.getParent(), "result" + file.getName());
+        File file = new File(outputDataPath);
+        var csvWriterP = new CsvWriterP("12.1", ';', file.getParent(), file.getName());
         csvWriterP.writeToFile(transposeTable);
         System.out.println("transportSystem");
 
