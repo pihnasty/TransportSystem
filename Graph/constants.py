@@ -3,7 +3,7 @@ class Constants:
 
     class YamlNames:
         app = "app"
-        initTransportSystemFile = "initTransportSystemFile"
+        initTransportSystemFiles = "initTransportSystemFiles"
 
     class JsonNames:
         output_data_path = "outputDataPath"

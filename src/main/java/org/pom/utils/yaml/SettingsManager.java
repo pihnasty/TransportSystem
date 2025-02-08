@@ -7,7 +7,9 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class SettingsManager {
 
@@ -21,9 +23,9 @@ public class SettingsManager {
     // Load settings from YAML file
     public void loadSettings() {
         Yaml yaml = new Yaml();
-        try (InputStream inputStream = SettingsManager.class.getClassLoader().getResourceAsStream("settings2.yaml")) {
+        try (InputStream inputStream = SettingsManager.class.getClassLoader().getResourceAsStream("settings.yaml")) {
             if (inputStream == null) {
-                throw new RuntimeException("settings2.yaml not found in resources");
+                throw new RuntimeException("settings.yaml not found in resources");
             }
             settings = yaml.loadAs(inputStream, Settings.class); //yaml.load(inputStream);
             System.out.println(settings);  // Print loaded YAML content
@@ -88,13 +90,22 @@ public class SettingsManager {
             public String name;
             public String version;
             public Locale locale;
-            public String initTransportSystemFile;
+            public Double researchTau;
+            public Double deltaTau;
+            public Double deltaLength;
+            public Map<String, TransportSystemParameters> initTransportSystemFiles;
         }
 
         @Getter
         public static class PrepareDataTableFormat {
             public int minWidth;
             public String cellFormat;
+        }
+
+        @Getter
+        public static class TransportSystemParameters {
+            public String id;
+            public List<Double> startTimes;
         }
     }
 }

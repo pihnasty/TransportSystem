@@ -25,10 +25,16 @@ import java.util.stream.IntStream;
 public class TransportSystemDeserializer extends StdDeserializer<TransportSystem> {
 
     private final Locale locale;
+    private final Double researchTau;
+    private final Double deltaTau;
+    private final Double deltaLength;
     public TransportSystemDeserializer() {
         super(TransportSystem.class);
         SettingsManager settingsManager = new SettingsManager();
         this.locale = settingsManager.getLocale();
+        this.researchTau = settingsManager.getApp().getResearchTau();
+        this.deltaTau = settingsManager.getApp().getDeltaTau();
+        this.deltaLength = settingsManager.getApp().getDeltaLength();
     }
 
     @SneakyThrows
@@ -105,13 +111,7 @@ public class TransportSystemDeserializer extends StdDeserializer<TransportSystem
         }
 
         TransportSystem transportSystem
-                = new TransportSystem(
-                new ArrayList<>(conveyors.values()),
-                        initDataPath,outputDataPath,
-                root.get("researchTau").asDouble(),
-                root.get("deltaTau").asDouble(),
-                root.get("deltaLength").asDouble()
-        );
+                = new TransportSystem(new ArrayList<>(conveyors.values()), initDataPath,outputDataPath);
         return transportSystem;
     }
 

@@ -13,7 +13,11 @@ public class MathUtil {
         }
 
         if (treeMap.firstKey() > key || treeMap.lastKey() < key) {
-            throw new IllegalArgumentException("The specified value of key must lie between the minimum and maximum keys in the map.");
+            throw new IllegalArgumentException(
+                    "The specified key value " + key
+                            + " must lie between the minimum " + treeMap.firstKey()
+                            + "  and maximum "+ treeMap.lastKey() + " keys in the map."
+            );
         }
 
         return treeMap.get(treeMap.ceilingKey(key));

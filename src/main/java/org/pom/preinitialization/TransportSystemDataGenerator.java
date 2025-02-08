@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.pom.Constants;
 import org.pom.utils.MathUtil;
 import org.pom.utils.io.csv.write.CsvWriterP;
@@ -15,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+@NoArgsConstructor(force = true)
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TransportSystemDataGenerator {
     private List<ConveyorDataGenerator> conveyors;
@@ -24,41 +28,46 @@ public class TransportSystemDataGenerator {
     @Getter
     private final double deltaLength;
 
+    private final String initTransportSystemFile;
+    private final String  cellFormat;
+    private final Locale locale;
+
     @JsonCreator
     public TransportSystemDataGenerator(
             @JsonProperty("conveyors") List<ConveyorDataGenerator> conveyors,
-            @JsonProperty("initDataPath") String initDataPath,
-            @JsonProperty("researchTau") double researchTau,
-            @JsonProperty("deltaTau") double deltaTau,
-            @JsonProperty("deltaLength") double deltaLength) {
-        this.initDataPath = initDataPath;
-        this.researchTau = researchTau;
-        this.deltaTau = deltaTau;
-        this.deltaLength = deltaLength;
-        this.conveyors = conveyors;
+            @JsonProperty("initDataPath") String initDataPath) {
+        this(conveyors, initDataPath, 0.0, 0.0, 0.0, "", "", Locale.getDefault());
     }
 
-    private static void createTransportSystem() throws IOException {
+    public TransportSystemDataGenerator(
+            String initTransportSystemFile,
+            String cellFormat,
+            Locale locale,
+            Double researchTau,
+            Double deltaTau,
+            Double deltaLength
+    ) {
+        this(null, "", researchTau, deltaTau, deltaLength, initTransportSystemFile, cellFormat, locale);
+    }
 
-        SettingsManager settingsManager = new SettingsManager();
+
+    private void createTransportSystem() throws IOException {
+
         ObjectMapper objectMapper = new ObjectMapper();
-        var initTransportSystemFile = settingsManager.getApp().getInitTransportSystemFile();
         TransportSystemDataGenerator transportSystem = objectMapper.readValue(new File(initTransportSystemFile), TransportSystemDataGenerator.class);
+
 
         transportSystem.conveyors.forEach(
                 conveyor -> {
-                    conveyor.createInitialDensity(transportSystem.getDeltaLength());
-                    conveyor.createInputFlow(transportSystem.deltaTau, transportSystem.researchTau);
-                    conveyor.createBunkerOutputFlow(transportSystem.deltaTau, transportSystem.researchTau);
-                    conveyor.createSpeed(transportSystem.deltaTau, transportSystem.researchTau);
-                    conveyor.createConveyorNodes(transportSystem.deltaTau, transportSystem.researchTau);
+                    conveyor.createInitialDensity(deltaLength);
+                    conveyor.createInputFlow(deltaTau, researchTau);
+                    conveyor.createBunkerOutputFlow(deltaTau, researchTau);
+                    conveyor.createSpeed(deltaTau, researchTau);
+                    conveyor.createConveyorNodes(deltaTau, researchTau);
                 }
         );
 
         var table = new ArrayList<List<String>>();
-
-        var cellFormat = settingsManager.getPrepareDataTableFormat().getCellFormat();
-        var locale = settingsManager.getApp().getLocale();
 
         var maxLengthConveyor = transportSystem.conveyors.stream()
                 .max(Comparator.comparingDouble(ConveyorDataGenerator::getLength))
@@ -124,6 +133,25 @@ public class TransportSystemDataGenerator {
     }
 
     public static void main(String[] args) throws IOException {
-        createTransportSystem();
+
+        SettingsManager settingsManager = new SettingsManager();
+        var initTransportSystemFiles = settingsManager.getApp().getInitTransportSystemFiles();
+        var cellFormat = settingsManager.getPrepareDataTableFormat().getCellFormat();
+        var locale = settingsManager.getApp().getLocale();
+        var researchTau = settingsManager.getApp().getResearchTau();
+        var deltaTau = settingsManager.getApp().getDeltaTau();
+        var deltaLength = settingsManager.getApp().getDeltaLength();
+
+        initTransportSystemFiles.keySet().forEach(
+                transportSystemFileName -> {
+                    TransportSystemDataGenerator transportSystem
+                            = new TransportSystemDataGenerator(transportSystemFileName,cellFormat, locale, researchTau, deltaTau, deltaLength);
+                    try {
+                        transportSystem.createTransportSystem();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
     }
 }

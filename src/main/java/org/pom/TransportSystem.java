@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.pom.utils.MathUtil;
@@ -13,9 +14,9 @@ import org.pom.utils.yaml.SettingsManager;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 @NoArgsConstructor(force = true)
+@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TransportSystem {
 
@@ -35,26 +36,31 @@ public class TransportSystem {
     private final double deltaTau;
     @Getter
     private final double deltaLength;
-    private SettingsManager settingsManager = new SettingsManager();
 
     // Map to store each conveyor and its children (downstream conveyors)
     private final Map<Conveyor, List<Conveyor>> conveyorTree;
+
+    private final String initTransportSystemFile;
+    private final String  cellFormat;
+    private final Locale locale;
 
     @JsonCreator
     public TransportSystem(
             @JsonProperty(Constants.JsonParametersNames.CONVEYORS) List<Conveyor> conveyors,
             @JsonProperty(Constants.JsonParametersNames.INIT_DATA_PATH) String initDataPath,
-            @JsonProperty(Constants.JsonParametersNames.OUTPUT_DATA_PATH) String outputDataPath,
-            @JsonProperty(Constants.JsonParametersNames.RESEARCH_TAU) double researchTau,
-            @JsonProperty(Constants.JsonParametersNames.DELTA_TAU) double deltaTau,
-            @JsonProperty(Constants.JsonParametersNames.DELTA_LENGTH) double deltaLength) {
-        this.initDataPath = initDataPath;
-        this.outputDataPath = outputDataPath;
-        this.researchTau = researchTau;
-        this.deltaTau = deltaTau;
-        this.deltaLength = deltaLength;
-        this.conveyors = conveyors;
-        this.conveyorTree = new HashMap<>();
+            @JsonProperty(Constants.JsonParametersNames.OUTPUT_DATA_PATH) String outputDataPath) {
+        this(conveyors, initDataPath, outputDataPath, 0.0, 0.0, 0.0, new HashMap<>(), "", "", Locale.getDefault());
+    }
+
+    public TransportSystem(
+            String initTransportSystemFile,
+            String cellFormat,
+            Locale locale,
+            Double researchTau,
+            Double deltaTau,
+            Double deltaLength
+    ) {
+        this(null, "", "", researchTau, deltaTau, deltaLength, null, initTransportSystemFile, cellFormat, locale);
     }
 
     /**
@@ -78,11 +84,10 @@ public class TransportSystem {
     }
 
     public void createTransportSystem() {
-        var initTransportSystemFiles = this.settingsManager.getApp().getInitTransportSystemFile();
         ObjectMapper objectMapper = ObjectMapperFactory.createTransportSystemMapper();
         TransportSystem transportSystem = null;
         try {
-            transportSystem = objectMapper.readValue(new File(initTransportSystemFiles), TransportSystem.class);
+            transportSystem = objectMapper.readValue(new File(initTransportSystemFile), TransportSystem.class);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,8 +96,7 @@ public class TransportSystem {
         outputDataPath = transportSystem.getOutputDataPath();
     }
 
-    public void processingTransportSystem() {
-        createTransportSystem();
+    public void processingTransportSystem(double startTime, double finishTime) {
         addInputConveyors();
         addOutputConveyors();
         List<Double> taus = inputConveyors.stream()
@@ -100,8 +104,10 @@ public class TransportSystem {
                 .map(conveyor -> new ArrayList<>(conveyor.getInputFlow().keys()))
                 .orElse(new ArrayList<>());
 
-        taus.forEach(tau -> conveyors.forEach(conveyor -> calculatedConveyorParameters(tau, conveyor)));
+        taus.stream().filter(t -> t >= startTime && t < finishTime).
+                forEach(tau -> conveyors.forEach(conveyor -> calculatedConveyorParameters(tau, conveyor)));
 
+        SettingsManager settingsManager = new SettingsManager();
         var cellFormat = settingsManager.getPrepareDataTableFormat().getCellFormat();
         var locale = settingsManager.getApp().getLocale();
         var table = new ArrayList<List<String>>();
@@ -179,13 +185,6 @@ public class TransportSystem {
         File file = new File(outputDataPath);
         var csvWriterP = new CsvWriterP("12.1", ';', file.getParent(), file.getName());
         csvWriterP.writeToFile(transposeTable);
-        System.out.println("transportSystem");
-
-
-
-
-
-        System.out.println();
     }
 
     private void calculatedConveyorParameters(Double tau, Conveyor conveyor) {
@@ -214,10 +213,5 @@ public class TransportSystem {
         conveyor.addParametersValues(tau, inputFlow.getValue(tau), plannedBunkerOutput, speed);
     }
 
-    public static void main(String[] args) {
-        TransportSystem transportSystem = new TransportSystem();
-        transportSystem.createTransportSystem();
-        transportSystem.processingTransportSystem();
-    }
 }
 

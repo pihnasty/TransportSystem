@@ -1,9 +1,0 @@
-app:
-  name: MyApp
-  version: 1.0.0
-  locale: Locale.US
-  initTransportSystemFile: "E:\\A\\TransportSystem\\src\\main\\resources\\project\\data.json"
-
-prepareDataTableFormat:
-  minWidth: 10
-  cellFormat: "%8.5f"

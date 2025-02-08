@@ -1,10 +1,4 @@
-import logging
-import math
-import random
-import time
 from os import path
-
-from numpy import mean, std
 
 from copy import deepcopy
 
@@ -19,9 +13,8 @@ class DataProcessing:
     initial_dimension_flow: None
     __numberExamples = 0
 
-    def __init__(self):
-        self.data = load_yaml_file(Constants.yaml_file)
-        self.json_data = read_json(self.data[Constants.YamlNames.app][Constants.YamlNames.initTransportSystemFile])
+    def __init__(self, file_name):
+        self.json_data = read_json(file_name)
         self.csv_data_path = self.json_data[Constants.JsonNames.output_data_path]
         self.output_data_path = self.json_data[Constants.JsonNames.output_data_path]
         self.csv_data = read_csv(self.csv_data_path)
