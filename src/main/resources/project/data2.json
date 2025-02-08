@@ -1,0 +1,317 @@
+{
+  "initDataPath": "E:\\A\\TransportSystem\\src\\main\\resources\\project\\initData2.csv",
+  "outputDataPath": "E:\\A\\TransportSystem\\src\\main\\resources\\project\\outputData2.csv",
+  "researchTau" : 110.0,
+  "deltaTau" : 0.01,
+  "deltaLength" : 0.01,
+  "conveyors": [
+    {
+      "id" : 1,
+      "connections" : {
+        "3": {}
+      },
+      "bunker" : {
+        "initialCapacity" : 0.5,
+        "maxCapacity" : 1.0,
+        "minAvailableCapacity" : 0.0,
+        "maxAvailableCapacity" : 2.0,
+        "bunkerOverMaxCapacity" : 0.1,
+        "densityOverMaxCapacity": 0.01,
+        "maxAvailableOutput": 1.0
+      },
+      "speed" : {
+        "minAvailableSpeed" : 0.0,
+        "maxAvailableSpeed" : 1.0,
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.5,
+          "a1" : 0.25,
+          "a2" : 0.5,
+          "a3" : 0.1666666
+        }
+      },
+      "density" : {
+        "maxAvailableDensity" : 1.0
+      },
+      "inputFlow" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.1666666,
+          "a1" : 0.1666666,
+          "a2" : 0.5,
+          "a3" : -0.125
+        }
+      },
+      "bunkerOutputFlow" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.5,
+          "a1" : 0.25,
+          "a2" : 0.5,
+          "a3" : 0.1666666
+        }
+      },
+      "initialDensity" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.1666666,
+          "a1" : 0.1666666,
+          "a2" : 0.5,
+          "a3" : 0.125
+        }
+      },
+      "length" : 1.0
+    },
+    {
+      "id" : 2,
+      "connections" : {
+        "5": {}
+      },
+      "bunker" : {
+        "initialCapacity" : 0.25,
+        "maxCapacity" : 0.5,
+        "minAvailableCapacity" : 0.0,
+        "maxAvailableCapacity" : 2.0,
+        "bunkerOverMaxCapacity" : 0.1,
+        "densityOverMaxCapacity": 0.01,
+        "maxAvailableOutput": 1.0
+      },
+      "speed" : {
+        "minAvailableSpeed" : 0.0,
+        "maxAvailableSpeed" : 1.0,
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.625,
+          "a1" : 0.3125,
+          "a2" : 1.0,
+          "a3" : 0.333333
+        }
+      },
+      "density" : {
+        "maxAvailableDensity" : 1.0
+      },
+      "inputFlow" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.2083333,
+          "a1" : 0.2083333,
+          "a2" : 1.0,
+          "a3" : -0.25
+        }
+      },
+      "initialDensity" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.2083333,
+          "a1" : 0.2083333,
+          "a2" : 1.0,
+          "a3" : 0.25
+        }
+      },
+      "length" : 0.5
+    },
+    {
+      "id" : 3,
+      "connections" : {
+        "5": {}
+      },
+      "bunker" : {
+        "initialCapacity" : 0.35,
+        "maxCapacity" : 0.7,
+        "minAvailableCapacity" : 0.0,
+        "maxAvailableCapacity" : 2.0,
+        "bunkerOverMaxCapacity" : 0.1,
+        "densityOverMaxCapacity": 0.01,
+        "maxAvailableOutput": 1.0
+      },
+      "speed" : {
+        "minAvailableSpeed" : 0.0,
+        "maxAvailableSpeed" : 1.0,
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.75,
+          "a1" : 0.375,
+          "a2" : 1.5,
+          "a3" : 0.5
+        }
+      },
+      "density" : {
+        "maxAvailableDensity" : 1.0
+      },
+      "initialDensity" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.25,
+          "a1" : 0.25,
+          "a2" : 1.5,
+          "a3" : 0.375
+        }
+      },
+      "length" : 0.7
+    },
+    {
+      "id" : 5,
+      "connections" : {
+        "7": {}
+      },
+      "bunker" : {
+        "initialCapacity" : 0.75,
+        "maxCapacity" : 1.5,
+        "minAvailableCapacity" : 0.0,
+        "maxAvailableCapacity" : 2.0,
+        "bunkerOverMaxCapacity" : 0.1,
+        "densityOverMaxCapacity": 0.01,
+        "maxAvailableOutput": 1.0
+      },
+      "speed" : {
+        "minAvailableSpeed" : 0.0,
+        "maxAvailableSpeed" : 1.0,
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 1.0,
+          "a1" : 0.5,
+          "a2" : 2.5,
+          "a3" : 0.83333
+        }
+      },
+      "density" : {
+        "maxAvailableDensity" : 1.0
+      },
+      "inputFlow" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.333333,
+          "a1" : 0.333333,
+          "a2" : 2.5,
+          "a3" : -0.625
+        }
+      },
+      "initialDensity" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.333333,
+          "a1" : 0.333333,
+          "a2" : 2.5,
+          "a3" : 0.625
+        }
+      },
+      "length" : 1.5
+    },
+    {
+      "id" : 7,
+      "connections" : {},
+      "bunker" : {
+        "initialCapacity" : 0.75,
+        "maxCapacity" : 1.5,
+        "minAvailableCapacity" : 0.0,
+        "maxAvailableCapacity" : 2.0,
+        "bunkerOverMaxCapacity" : 0.1,
+        "densityOverMaxCapacity": 0.01,
+        "maxAvailableOutput": 1.0
+      },
+      "speed" : {
+        "minAvailableSpeed" : 0.0,
+        "maxAvailableSpeed" : 1.0,
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 1.25,
+          "a1" : 0.625,
+          "a2" : 3.5,
+          "a3" : 1.16666
+        }
+      },
+      "density" : {
+        "maxAvailableDensity" : 1.0
+      },
+      "initialDensity" : {
+        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
+        "parameters" : {
+          "a0" : 0.416666,
+          "a1" : 0.416666,
+          "a2" : 3.5,
+          "a3" : 0.875
+        }
+      },
+      "length" : 1.5
+    }
+  ],
+  "plot_parameters" : {
+    "dpi": 1000,
+    "input_flow_plot_name": {
+      "visual_line_set": {"0": 0, "1": 1, "2": 2, "3": 3, "4": 4, "5": 1}
+    , "color_line_set": {"0": "k", "1": "b", "2": "r", "3": "g", "4": "k", "5": "y"}
+    , "fontsize": 9
+    , "alpha_main": 1.0
+    , "alpha_grid": 0.7
+    , "color": "black"
+    , "x_min": 100.0
+    , "x_max": 102.5
+    , "x_tick_main": 0.5
+    , "x_tick_auxiliary": 0.25
+    , "y_min": 0.0
+    , "y_max": 1.0
+    , "y_tick_main": 0.1
+    , "y_tick_auxiliary": 0.05
+    , "x_axis_order": "forward"
+    , "x_label_name": "$\\tau$"
+    , "y_label_name": "$\\gamma_f(\\tau)$"
+    , "x_size_plot": 85.0
+    , "y_size_plot": 60.0
+    , "plot_line_width": 1.5
+    , "grid_line_width": 1.0
+    , "border_adjustment": {
+        "left": 0.15, "right": 0.92, "top": 0.92, "bottom": 0.17
+      }
+    }
+  },
+  "plot_structure": [
+    {
+      "plot_template" : {
+        "plot_name": "input_flow_plot_name",
+        "plot_parameters": {
+
+        }
+      },
+      "path": "inputFlow",
+      "file_name": "initInputFlow",
+      "y_columns": [
+        "1.inputFlow",
+        "2.inputFlow",
+        "4.inputFlow",
+        "5.inputFlow"
+      ],
+      "x_column": "tau"
+    },
+    {
+      "plot_template" : {
+        "plot_name": "input_flow_plot_name",
+        "plot_parameters": {
+          "y_min": 0.0,
+          "y_max": 2.0,
+          "y_tick_main": 0.2,
+          "y_tick_auxiliary": 0.1
+        }
+      },
+      "path": "inputFlow",
+      "file_name": "innerInputFlow",
+      "y_columns": [
+        "3.inputFlow",
+        "6.inputFlow",
+        "7.inputFlow",
+        "8.inputFlow"
+      ],
+      "x_column": "tau"
+    },
+    {
+      "plot_template" : {
+        "plot_name": "input_flow_plot_name"
+      },
+      "path": "inputFlow",
+      "file_name": "innerInputFlow",
+      "y_columns": [
+        "8.inputFlow"
+      ],
+      "x_column": "tau"
+    }
+  ]
+}

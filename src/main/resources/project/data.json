@@ -8,7 +8,7 @@
     {
       "id" : 1,
       "connections" : {
-        "3": {}
+        "4": {}
       },
       "bunker" : {
         "initialCapacity" : 0.5,
@@ -113,7 +113,7 @@
     {
       "id" : 3,
       "connections" : {
-        "6": {}
+        "4": {}
       },
       "bunker" : {
         "initialCapacity" : 0.35,
@@ -198,69 +198,8 @@
       "length" : 0.8
     },
     {
-      "id" : 5,
-      "connections" : {
-        "6": {}
-      },
-      "bunker" : {
-        "initialCapacity" : 0.75,
-        "maxCapacity" : 1.5,
-        "minAvailableCapacity" : 0.0,
-        "maxAvailableCapacity" : 2.0,
-        "bunkerOverMaxCapacity" : 0.1,
-        "densityOverMaxCapacity": 0.01,
-        "maxAvailableOutput": 1.0
-      },
-      "speed" : {
-        "minAvailableSpeed" : 0.0,
-        "maxAvailableSpeed" : 1.0,
-        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
-        "parameters" : {
-          "a0" : 1.0,
-          "a1" : 0.5,
-          "a2" : 2.5,
-          "a3" : 0.83333
-        }
-      },
-      "density" : {
-        "maxAvailableDensity" : 1.0
-      },
-      "inputFlow" : {
-        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
-        "parameters" : {
-          "a0" : 0.333333,
-          "a1" : 0.333333,
-          "a2" : 2.5,
-          "a3" : -0.625
-        }
-      },
-      "initialDensity" : {
-        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
-        "parameters" : {
-          "a0" : 0.333333,
-          "a1" : 0.333333,
-          "a2" : 2.5,
-          "a3" : 0.625
-        }
-      },
-      "length" : 1.5
-    },
-    {
       "id" : 6,
-      "connections" : {
-        "7" : {
-          "function" : "y(x) = a0+a1*x+a2*x*x+a3*x*x*x+a4*x*x*x*x",
-          "parameters" : {
-            "a0" : 2.0
-          }
-        },
-        "8" : {
-          "function" : "y(x) = a0+a1*x+a2*x*x+a3*x*x*x+a4*x*x*x*x",
-          "parameters" : {
-            "a0" : 3.0
-          }
-        }
-      },
+      "connections" : {},
       "bunker" : {
         "initialCapacity" : 0.5,
         "maxCapacity" : 1.0,
@@ -294,80 +233,6 @@
         }
       },
       "length" : 1.0
-    },
-    {
-      "id" : 7,
-      "connections" : {},
-      "bunker" : {
-        "initialCapacity" : 0.75,
-        "maxCapacity" : 1.5,
-        "minAvailableCapacity" : 0.0,
-        "maxAvailableCapacity" : 2.0,
-        "bunkerOverMaxCapacity" : 0.1,
-        "densityOverMaxCapacity": 0.01,
-        "maxAvailableOutput": 1.0
-      },
-      "speed" : {
-        "minAvailableSpeed" : 0.0,
-        "maxAvailableSpeed" : 1.0,
-        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
-        "parameters" : {
-          "a0" : 1.25,
-          "a1" : 0.625,
-          "a2" : 3.5,
-          "a3" : 1.16666
-        }
-      },
-      "density" : {
-        "maxAvailableDensity" : 1.0
-      },
-      "initialDensity" : {
-        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
-        "parameters" : {
-          "a0" : 0.416666,
-          "a1" : 0.416666,
-          "a2" : 3.5,
-          "a3" : 0.875
-        }
-      },
-      "length" : 1.5
-    },
-    {
-      "id" : 8,
-      "connections" : {},
-      "bunker" : {
-        "initialCapacity" : 0.3,
-        "maxCapacity" : 0.6,
-        "minAvailableCapacity" : 0.0,
-        "maxAvailableCapacity" : 2.0,
-        "bunkerOverMaxCapacity" : 0.1,
-        "densityOverMaxCapacity": 0.01,
-        "maxAvailableOutput": 1.0
-      },
-      "speed" : {
-        "minAvailableSpeed" : 0.0,
-        "maxAvailableSpeed" : 1.0,
-        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
-        "parameters" : {
-          "a0" : 1.375,
-          "a1" : 0.6875,
-          "a2" : 4.0,
-          "a3" : 1.33333
-        }
-      },
-      "density" : {
-        "maxAvailableDensity" : 1.0
-      },
-      "initialDensity" : {
-        "function" : "y(x) = a0+a1*sin(2*Pi*a2*x+2*Pi*a3)",
-        "parameters" : {
-          "a0" : 0.458333,
-          "a1" : 0.458333,
-          "a2" : 4.0,
-          "a3" : 1.0
-        }
-      },
-      "length" : 0.6
     }
   ],
   "plot_parameters" : {
