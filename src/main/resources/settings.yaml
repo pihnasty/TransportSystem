@@ -3,8 +3,8 @@ app:
   version: 1.0.0
   locale: Locale.US
 
-  "researchTau": 110.0
-  "deltaTau": 0.01
+  "researchTau": 100.0
+  "deltaTau": 0.1
   "deltaLength" : 0.01
   initTransportSystemFiles:
     "E:\\A\\TransportSystem\\src\\main\\resources\\project\\data.json" :

@@ -111,18 +111,19 @@
       "length" : 0.5
     },
     {
-      "id" : 3,
+      "id" : 8,
+      "reversible" : true,
       "connections" : {
         "5": {}
       },
       "bunker" : {
-        "initialCapacity" : 0.35,
+        "initialCapacity" : 0.0,
         "maxCapacity" : 0.7,
         "minAvailableCapacity" : 0.0,
         "maxAvailableCapacity" : 2.0,
         "bunkerOverMaxCapacity" : 0.1,
         "densityOverMaxCapacity": 0.01,
-        "maxAvailableOutput": 1.0
+        "maxAvailableOutput": 1000.0
       },
       "speed" : {
         "minAvailableSpeed" : 0.0,

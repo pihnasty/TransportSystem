@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.pom.utils.ConveyorUtil;
 import org.pom.utils.MathUtil;
 import org.pom.utils.ParametersValidator;
 
@@ -95,5 +96,9 @@ public class Speed implements KeysValuesProvider<Double> {
     @Override
     public Collection<Double> keys() {
         return Collections.unmodifiableCollection(tauToSpeedMap.keySet());
+    }
+
+    public void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTime, List<Double> taus) {
+        ConveyorUtil.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus, tauToSpeedMap, 0.0);
     }
 }

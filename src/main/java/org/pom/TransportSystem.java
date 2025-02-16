@@ -24,10 +24,12 @@ public class TransportSystem {
     private List<Conveyor> conveyors= new ArrayList<>();
     /**
      * A list of output conveyors of the transport system.
-     * Each {@link Conveyor} in the list represents a pathway for processed materials or items to exit the system.
+     * Each conveyor in the list represents a pathway for processed materials or items to exit the system.
      */
     private final List<Conveyor> outputConveyors = new ArrayList<>();
     private final List<Conveyor> inputConveyors = new ArrayList<>();
+    @Getter
+    private final List<Double> taus = new ArrayList<>();
     @Getter
     private String initDataPath;
     @Getter
@@ -94,16 +96,13 @@ public class TransportSystem {
         conveyors = transportSystem.getConveyors();
         initDataPath = transportSystem.getInitDataPath();
         outputDataPath = transportSystem.getOutputDataPath();
+
+        addInputConveyors();
+        addOutputConveyors();
+        this.taus.addAll(transportSystem.getTaus());
     }
 
     public void processingTransportSystem(double startTime, double finishTime) {
-        addInputConveyors();
-        addOutputConveyors();
-        List<Double> taus = inputConveyors.stream()
-                .findFirst()
-                .map(conveyor -> new ArrayList<>(conveyor.getInputFlow().keys()))
-                .orElse(new ArrayList<>());
-
         taus.stream().filter(t -> t >= startTime && t < finishTime).
                 forEach(tau -> conveyors.forEach(conveyor -> calculatedConveyorParameters(tau, conveyor)));
 
@@ -211,6 +210,10 @@ public class TransportSystem {
         var plannedBunkerOutput = Objects.isNull(conveyor.getBunkerOutputFlow())
                 ? conveyor.getBunker().getMaxAvailableOutput() : conveyor.getBunkerOutputFlow().getValueAtTau(tau);
         conveyor.addParametersValues(tau, inputFlow.getValue(tau), plannedBunkerOutput, speed);
+    }
+
+    public void addTaus(List<Double> taus) {
+        this.taus.addAll(taus);
     }
 
 }

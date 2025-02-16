@@ -58,7 +58,7 @@ public class TransportSystemDeserializer extends StdDeserializer<TransportSystem
         JsonNode conveyorsNode = root.get(Constants.JsonParametersNames.CONVEYORS);
         if (conveyorsNode != null) {
             for (JsonNode conveyorNode : conveyorsNode) {
-                Conveyor conveyor = mapper.treeToValue(conveyorNode, Conveyor.class);  // Deserialize conveyor node to Conveyor object
+                Conveyor conveyor = mapper.treeToValue(conveyorNode, Conveyor.class);
                 var conveyorId = conveyor.getId();
                 var initialDensityValues = extractRowByName(
                         Constants.ColumnsNames.generateHeader(conveyorId, Constants.ColumnsNames.INITIAL_DENSITY),
@@ -112,6 +112,7 @@ public class TransportSystemDeserializer extends StdDeserializer<TransportSystem
 
         TransportSystem transportSystem
                 = new TransportSystem(new ArrayList<>(conveyors.values()), initDataPath,outputDataPath);
+        transportSystem.addTaus(taus);
         return transportSystem;
     }
 

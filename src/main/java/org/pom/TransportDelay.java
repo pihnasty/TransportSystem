@@ -1,6 +1,7 @@
 package org.pom;
 
 import lombok.extern.slf4j.Slf4j;
+import org.pom.utils.ConveyorUtil;
 import org.pom.utils.MathUtil;
 import org.pom.utils.ParametersValidator;
 
@@ -26,8 +27,8 @@ public class TransportDelay implements KeysValuesProvider<Double> {
     private final TreeMap<Double, Double> delayForConveyorLength;
 
     /**
-     * Constructs an empty {@code TransportDelay} object with an initialized
-     * {@link TreeMap} for managing delay-to-distance mappings.
+     * Constructs an empty TransportDelay object with an initialized
+     * TreeMap for managing delay-to-distance mappings.
      */
     public TransportDelay(double conveyorLength) {
         this.conveyorLength = conveyorLength;
@@ -91,6 +92,11 @@ public class TransportDelay implements KeysValuesProvider<Double> {
         return MathUtil.getValueByKey(distanceToDelay, tau) - distanceToDelay.firstEntry().getValue();
     }
 
+    /**
+     * This method calculates ksi = G(tau) - G(0).
+     * @param tau the tau for which the delta distance is calculated.
+     * @return
+     */
     private double calculateDistance(double tau) {
         return delayToDistance.isEmpty()
                 ? 0.0
@@ -107,5 +113,21 @@ public class TransportDelay implements KeysValuesProvider<Double> {
     @Override
     public Collection<Double> keys() {
         return Collections.unmodifiableCollection(delayForConveyorLength.keySet());
+    }
+
+    public void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTau, List<Double> taus)  {
+        var lastDistance = delayToDistance.lastKey();
+        var lastTau = previousFinishTau; // distanceToDelay.lastKey();
+        taus.stream().filter(tau -> lastTau < tau && tau < currentTau).forEach(
+                tau -> delayToDistance.put(lastDistance, Map.of(Constants.TAU, tau, Constants.SPEED, 0.0))
+        );
+
+        ConveyorUtil.fillEmptyParametersByCurrentTau(currentTau, previousFinishTau, taus, distanceToDelay, lastDistance);
+
+        var lastDelayForConveyorLengthKey = delayForConveyorLength.lastKey();
+        var lastDelayForConveyorLengthValue = delayForConveyorLength.get(lastDelayForConveyorLengthKey);
+        taus.stream().filter(tau -> lastTau < tau && tau < currentTau).forEach(
+                tau -> delayForConveyorLength.put(lastDistance, lastDelayForConveyorLengthValue + tau - lastDelayForConveyorLengthKey)
+        );
     }
 }

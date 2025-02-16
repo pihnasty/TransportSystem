@@ -9,10 +9,7 @@ import org.pom.utils.MathUtil;
 import org.pom.utils.MessagesUtil;
 import org.pom.utils.ParametersValidator;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * The {@code Bunker} class models a storage system that tracks input and output flows
@@ -70,15 +67,15 @@ public class Bunker {
         return tauToBunkerParametersMap.values().stream().map(params -> params.get(key)).toList();
     }
 
-    public void addParametersValues(double tau, double input, double output, double outputForMaxDensity) {
+    public void addParametersValues(double tau, double input, double planedBunkerOutput, double outputForMaxDensity) {
         ParametersValidator.validateNonNegativeKeyValue(
                 "Bunker", Map.of("tau", tau, "input", input,
-                        "output", output, "outputForMaxDensity", outputForMaxDensity)
+                        "planedBunkerOutput", planedBunkerOutput, "outputForMaxDensity", outputForMaxDensity)
         );
         if(tauToBunkerParametersMap.isEmpty()) {
-            this.tauToBunkerParametersMap.put(tau, calculateInitialParameters(input, output));
+            this.tauToBunkerParametersMap.put(tau, calculateInitialParameters(input, planedBunkerOutput));
         } else {
-            this.tauToBunkerParametersMap.put(tau, getBunkerParameters(tau, input, output, outputForMaxDensity));
+            this.tauToBunkerParametersMap.put(tau, getBunkerParameters(tau, input, planedBunkerOutput, outputForMaxDensity));
         }
         log.debug(MessagesUtil.addParametersMessage(
                 "Bunker parameters added => ", tauToBunkerParametersMap.get(tau)));
@@ -145,6 +142,29 @@ public class Bunker {
         return getParameterAtTau(Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY, tau);
     }
 
+    public void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTime, List<Double> taus, BunkerOutputFlow bunkerOutputFlow) {
+        var lastEntry = tauToBunkerParametersMap.lastEntry();
+        var capacity = lastEntry.getValue().get(Constants.ColumnsNames.BUNKER_CAPACITY);
+        var overMaxCapacity = lastEntry.getValue().get(Constants.ColumnsNames.BUNKER_OVER_MAX_CAPACITY);
+        var densityOverMaxCapacity = lastEntry.getValue().get(Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY);
+
+        taus.stream().filter(tau -> previousFinishTime <= tau && tau < currentTau).forEach(
+                tau -> {
+                    var bunkerParameters = getBunkerParameters(
+                            0.0, getBunkerOutputFlowValueByTau(tau, bunkerOutputFlow), 0.0, 0.0,
+                            capacity, overMaxCapacity, densityOverMaxCapacity);
+                    tauToBunkerParametersMap.put(tau, bunkerParameters);
+                }
+
+        );
+    }
+
+    private double getBunkerOutputFlowValueByTau(double tau, BunkerOutputFlow bunkerOutputFlow) {
+        return Objects.isNull(bunkerOutputFlow)
+                ? this.getMaxAvailableOutput() : bunkerOutputFlow.getValueAtTau(tau);
+    }
+
+
     /**
      * Calculates the initial parameters for the bunker at the start of operations.
      */
@@ -177,7 +197,7 @@ public class Bunker {
      * Calculates bunker parameters for a specific time point based on input and output flow rates.
      */
     private Map<String, Double> getBunkerParameters(
-            double tau, double input, double planedOutput, double maxDensityOutputFlow) {
+            double tau, double input, double planedBunkerOutput, double maxDensityOutputFlow) {
         var lastEntry = this.tauToBunkerParametersMap.lastEntry().getValue();
         var deltaTau = tau - tauToBunkerParametersMap.lastEntry().getKey();
 
@@ -200,18 +220,18 @@ public class Bunker {
                 deltaTau
         );
 
-        return getBunkerParameters(input, planedOutput, lastRealOutputFlow, lastOnConveyorBeltBunkerOutputFlow,capacity,
+        return getBunkerParameters(input, planedBunkerOutput, lastRealOutputFlow, lastOnConveyorBeltBunkerOutputFlow,capacity,
                 overMaxCapacity, densityOverMaxCapacity);
 
     }
 
     private Map<String, Double>getBunkerParameters(
-            double input, double planedOutput, double lastRealFlow, double lastOnConveyorBeltBunkerOutputFlow,
+            double input, double planedBunkerOutput, double lastRealFlow, double lastOnConveyorBeltBunkerOutputFlow,
             double capacity, double overMaxCapacity, double densityOverMaxCapacity
     ) {
         var bunkerParameters = new HashMap<String, Double>();
         bunkerParameters.put(Constants.ColumnsNames.BUNKER_INPUT_FLOW, input);
-        bunkerParameters.put(Constants.ColumnsNames.BUNKER_PLANED_OUTPUT_FLOW, planedOutput);
+        bunkerParameters.put(Constants.ColumnsNames.BUNKER_PLANED_OUTPUT_FLOW, planedBunkerOutput);
         bunkerParameters.put(Constants.ColumnsNames.BUNKER_CAPACITY, capacity);
         bunkerParameters.put(Constants.ColumnsNames.BUNKER_OVER_MAX_CAPACITY, overMaxCapacity);
         bunkerParameters.put(Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY, densityOverMaxCapacity);

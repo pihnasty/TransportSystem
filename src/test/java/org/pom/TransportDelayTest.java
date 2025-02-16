@@ -22,6 +22,7 @@ class TransportDelayTest {
             var speed = 1.0 +tau;
             transportDelay.addParametersValues(tau, speed);
         }
+        System.out.println();
     }
 
     @Test

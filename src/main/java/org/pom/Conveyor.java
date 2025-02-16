@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.pom.utils.MessagesUtil;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -18,21 +19,23 @@ import java.util.function.Function;
 public class Conveyor {
     @Setter
     private ConveyorNode conveyorNode;
-    private final Bunker bunker;
-    private final Speed speed;
+    private Bunker bunker;
+    private Speed speed;
     private final double length;
-    private final TransportDelay transportDelay;
-    private final OutputFlow outputFlow;
-    private final Density density;
-    private final InputFlow inputFlow;
-    private final BunkerOutputFlow bunkerOutputFlow;
+    private TransportDelay transportDelay;
+    private OutputFlow outputFlow;
+    private Density density;
+    private InputFlow inputFlow;
+    private BunkerOutputFlow bunkerOutputFlow;
     @Setter
     private InitialDensity initialDensity;
     private final int id;
+    private final boolean reversible;
 
     @JsonCreator
     public Conveyor(
-            @JsonProperty("id") int id,
+            @JsonProperty(Constants.JsonParametersNames.ID) int id,
+            @JsonProperty(Constants.JsonParametersNames.REVERSIBLE) boolean reversible,
             @JsonProperty("bunker") Bunker bunker,
             @JsonProperty("density") Density density,
             @JsonProperty("speed") Speed speed,
@@ -52,6 +55,7 @@ public class Conveyor {
         this.outputFlow = new OutputFlow(bunker, speed, initialDensity, transportDelay);
         this.density = density;
         this.conveyorNode = conveyorNode;
+        this.reversible = reversible;
     }
 
     public void addParametersValues(double tau,double bunkerInput,double planedBunkerOutput,double speed) {
@@ -109,5 +113,43 @@ public class Conveyor {
             throw new IllegalArgumentException(message);
         }
         this.conveyorNode.setId(id);
+    }
+
+    public void copyMainParameters(Conveyor conveyor, double currentTau, double previousFinishTime, List<Double> taus) {
+        conveyor.bunker.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus,  conveyor.bunkerOutputFlow);
+        this.bunker = conveyor.bunker;
+
+        conveyor.speed.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.speed = conveyor.speed;
+
+        conveyor.inputFlow.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.inputFlow = conveyor.inputFlow;
+
+        conveyor.outputFlow.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.outputFlow = conveyor.outputFlow;
+
+        conveyor.density.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.density = conveyor.density;
+
+        this.transportDelay = conveyor.transportDelay;
+    }
+
+    public void copyReversibleMainParameters(Conveyor conveyor, double currentTau, double previousFinishTime, List<Double> taus) {
+        conveyor.bunker.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus,  conveyor.bunkerOutputFlow);
+        this.bunker = conveyor.bunker;
+
+        conveyor.speed.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.speed = conveyor.speed;
+
+        conveyor.inputFlow.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.inputFlow = conveyor.inputFlow;
+
+        conveyor.outputFlow.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.outputFlow = conveyor.outputFlow;
+
+        conveyor.density.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.density = conveyor.density;
+
+        this.transportDelay = conveyor.transportDelay;
     }
 }

@@ -3,9 +3,11 @@ package org.pom;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import org.pom.utils.ConveyorUtil;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.TreeMap;
 
 @Getter
@@ -42,5 +44,9 @@ public class InputFlow  implements KeysValuesProvider<Double> {
 
     public int size() {
         return  inputFlowMap.values().size();
+    }
+
+    public void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTime, List<Double> taus) {
+        ConveyorUtil.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus, inputFlowMap, 0.0);
     }
 }

@@ -2,6 +2,7 @@ package org.pom;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.pom.utils.ConveyorUtil;
 import org.pom.utils.MathUtil;
 import org.pom.utils.ParametersValidator;
 
@@ -92,5 +93,10 @@ public class OutputFlow implements KeysValuesProvider<Double> {
 
     public Double lastKey() {
         return Objects.nonNull(tauToFlowOutputMap) ? tauToFlowOutputMap.lastKey() : 0.0;
+    }
+
+
+    public void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTime, List<Double> taus) {
+        ConveyorUtil.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus, tauToFlowOutputMap, 0.0);
     }
 }

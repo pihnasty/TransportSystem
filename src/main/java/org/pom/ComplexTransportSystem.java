@@ -15,13 +15,39 @@ public class ComplexTransportSystem {
         Map<String, TransportSystem> transportSystems = createTransportSystems();
         TreeMap<Double, String> sortedByStartTimeTransportSystems = sortedByStartTimeTransportSystems();
 
+
+        Map<Integer, Conveyor> conveyors = new TreeMap<>();
         var researchTau = settingsManager.getApp().getResearchTau();
+        var deltaTau = settingsManager.getApp().getDeltaTau();
+        var taus = transportSystems.values().stream().findFirst().get().getTaus();
         sortedByStartTimeTransportSystems.keySet().forEach(
                 startCoefficientTime -> {
                     var finishCoefficientTime = getFinishCoefficientTime(startCoefficientTime, sortedByStartTimeTransportSystems);
+                    var previousCoefficientTime = getPreviousFinishCoefficientTime(startCoefficientTime, sortedByStartTimeTransportSystems);
                     TransportSystem transportSystem
                             = transportSystems.get(sortedByStartTimeTransportSystems.get(startCoefficientTime));
+                    transportSystem.getConveyors().forEach(
+                            conveyor -> {
+                                var previousStateConveyor = conveyors.get(conveyor.getId());
+                                if (previousStateConveyor != null) {
+                                    if (conveyor.isReversible() == previousStateConveyor.isReversible()) {
+                                        conveyor.copyMainParameters(previousStateConveyor,
+                                                startCoefficientTime * researchTau,
+                                                previousCoefficientTime * researchTau,
+                                                taus);
+                                    } else {
+                                        conveyor.copyReversibleMainParameters(previousStateConveyor,
+                                                startCoefficientTime * researchTau,
+                                                previousCoefficientTime * researchTau,
+                                                taus);
+                                    }
+                                }
+                            });
+
                     transportSystem.processingTransportSystem(startCoefficientTime * researchTau, finishCoefficientTime *researchTau);
+                    transportSystem.getConveyors().forEach(
+                            conveyor -> conveyors.put(conveyor.getId(), conveyor)
+                    );
                     System.out.println();
                 }
         );
@@ -32,6 +58,11 @@ public class ComplexTransportSystem {
     private static Double getFinishCoefficientTime(Double startTime, TreeMap<Double, String> sortedByStartTimeTransportSystems) {
         var finishTime = sortedByStartTimeTransportSystems.higherKey(startTime);
         return (finishTime == null) ? 1.0 : finishTime;
+    }
+
+    private static Double getPreviousFinishCoefficientTime(Double startTime, TreeMap<Double, String> sortedByStartTimeTransportSystems) {
+        var previousFinishTime = sortedByStartTimeTransportSystems.lowerKey(startTime);
+        return (previousFinishTime == null) ? 0.0 : previousFinishTime;
     }
 
     private TreeMap<Double, String> sortedByStartTimeTransportSystems() {
