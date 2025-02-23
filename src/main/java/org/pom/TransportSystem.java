@@ -35,6 +35,7 @@ public class TransportSystem {
     @Getter
     private String outputDataPath;
     private final double researchTau;
+    @Getter
     private final double deltaTau;
     @Getter
     private final double deltaLength;

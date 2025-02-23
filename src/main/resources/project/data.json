@@ -299,7 +299,7 @@
         "3.inputFlow",
         "6.inputFlow",
         "7.inputFlow",
-        "8.inputFlow"
+        "1.inputFlow"
       ],
       "x_column": "tau"
     },
@@ -310,7 +310,7 @@
       "path": "inputFlow",
       "file_name": "innerInputFlow",
       "y_columns": [
-        "8.inputFlow"
+        "1.inputFlow"
       ],
       "x_column": "tau"
     }

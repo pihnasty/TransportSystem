@@ -11,6 +11,7 @@ import org.pom.utils.MessagesUtil;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 @Slf4j
@@ -117,18 +118,47 @@ public class Conveyor {
         this.conveyorNode.setId(id);
     }
 
+    public void copyReversibleMainParameters(Conveyor conveyor, Conveyor reversibleConveyor,
+                                             double currentTau,
+                                             double previousFinishTime,
+                                             double deltaTau,
+                                             List<Double> taus) {
+        copyBaseParameters(conveyor, currentTau, previousFinishTime, taus);
+        conveyor.density.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
+        this.density = conveyor.density;
+
+        if(!reversibleConveyor.getDensity().keys().isEmpty()) {
+            var reversibleInitialDensityMap = getDensityByLength(reversibleConveyor, currentTau -deltaTau);
+            TreeMap<Double, Double> initialDensityMap = getReversibleInitialDensityMap(reversibleInitialDensityMap);
+            this.initialDensity = new InitialDensity(initialDensityMap);
+            this.transportDelay = new TransportDelay(this.length);
+            this.outputFlow = new OutputFlow(bunker, speed, initialDensity, transportDelay);
+        }
+    }
+
+    private TreeMap<Double, Double> getReversibleInitialDensityMap(TreeMap<Double, Double> densityMap) {
+        var reversibleDensityMap = new TreeMap<Double, Double>();
+        densityMap.keySet().forEach(
+                key ->reversibleDensityMap.put(length - key, densityMap.get(key))
+        );
+        return reversibleDensityMap;
+    }
+
+    private TreeMap<Double, Double> getDensityByLength(Conveyor conveyor, double tau) {
+        var densityMap = new TreeMap<Double, Double>();
+        conveyor.getInitialDensity().getDensityMap().keySet().forEach(
+                key -> {
+                    var delay = conveyor.getTransportDelay().getDelayByDeltaDistance(key);
+                    var reversibleConveyorDensity = conveyor.getDensity();
+                    var currentConveyorDensityValue = reversibleConveyorDensity.getDensity(tau - delay);
+                    densityMap.put(key, currentConveyorDensityValue);
+                }
+        );
+        return densityMap;
+    }
+
     public void copyMainParameters(Conveyor conveyor, double currentTau, double previousFinishTime, List<Double> taus) {
-        conveyor.bunker.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus,  conveyor.bunkerOutputFlow);
-        this.bunker = conveyor.bunker;
-
-        conveyor.speed.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
-        this.speed = conveyor.speed;
-
-        conveyor.inputFlow.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
-        this.inputFlow = conveyor.inputFlow;
-
-        conveyor.outputFlow.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
-        this.outputFlow = conveyor.outputFlow;
+        copyBaseParameters(conveyor, currentTau, previousFinishTime, taus);
 
         conveyor.density.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
         this.density = conveyor.density;
@@ -136,7 +166,7 @@ public class Conveyor {
         this.transportDelay = conveyor.transportDelay;
     }
 
-    public void copyReversibleMainParameters(Conveyor conveyor, double currentTau, double previousFinishTime, List<Double> taus) {
+    private void copyBaseParameters(Conveyor conveyor, double currentTau, double previousFinishTime, List<Double> taus) {
         conveyor.bunker.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus,  conveyor.bunkerOutputFlow);
         this.bunker = conveyor.bunker;
 
@@ -148,11 +178,6 @@ public class Conveyor {
 
         conveyor.outputFlow.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
         this.outputFlow = conveyor.outputFlow;
-
-        conveyor.density.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
-        this.density = conveyor.density;
-
-        this.transportDelay = conveyor.transportDelay;
     }
 
     public boolean isReversible() {

@@ -4,6 +4,7 @@ import org.pom.utils.yaml.SettingsManager;
 
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ComplexTransportSystem {
     private final SettingsManager settingsManager;
@@ -27,6 +28,8 @@ public class ComplexTransportSystem {
                 }
         );
 
+        AtomicReference<String> lastTransportSystemId = new AtomicReference<>("");
+
         sortedByStartTimeTransportSystems.keySet().forEach(
                 startCoefficientTime -> {
                     var finishCoefficientTime = getFinishCoefficientTime(startCoefficientTime, sortedByStartTimeTransportSystems);
@@ -37,12 +40,17 @@ public class ComplexTransportSystem {
                             conveyor -> {
                                 var previousStateConveyor = conveyors.get(conveyor.getId());
                                     if (conveyor.isReversible()) {
-                                        conveyor.copyReversibleMainParameters(previousStateConveyor,
+                                        var previousReversibleStateConveyor = conveyors.get(conveyor.getReversible());
+                                        conveyor.copyReversibleMainParameters(
+                                                previousStateConveyor,
+                                                previousReversibleStateConveyor,
                                                 startCoefficientTime * researchTau,
                                                 previousCoefficientTime * researchTau,
+                                                transportSystem.getDeltaTau(),
                                                 taus);
                                     } else {
-                                        conveyor.copyMainParameters(previousStateConveyor,
+                                        conveyor.copyMainParameters(
+                                                previousStateConveyor,
                                                 startCoefficientTime * researchTau,
                                                 previousCoefficientTime * researchTau,
                                                 taus);
@@ -53,11 +61,36 @@ public class ComplexTransportSystem {
                     transportSystem.getConveyors().forEach(
                             conveyor -> conveyors.put(conveyor.getId(), conveyor)
                     );
-                    System.out.println();
+                    lastTransportSystemId.set(sortedByStartTimeTransportSystems.get(startCoefficientTime));
                 }
         );
+        fillOtherTransportSystems(transportSystems, lastTransportSystemId.get(), sortedByStartTimeTransportSystems, researchTau);
+    }
 
-
+    /**
+     * Processes all transport systems except the last one by calling their processingTransportSystem method
+     * with the computed finishTau. It is filled in all the values of each transport system up to the final tau.
+     *
+     * @param transportSystems A map containing transport systems identified by their IDs.
+     * @param lastTransportSystemId The ID of the last transport system to be excluded from processing.
+     * @param sortedByStartTimeTransportSystems A sorted map where keys represent start times
+     *                                          and values represent transport system IDs.
+     * @param researchTau A scaling factor used to compute the final processing time.
+     */
+    private void fillOtherTransportSystems(
+            Map<String, TransportSystem> transportSystems,
+            String lastTransportSystemId,
+            TreeMap<Double, String> sortedByStartTimeTransportSystems,
+            Double researchTau
+    ) {
+        var finishTau = sortedByStartTimeTransportSystems.lastKey() * researchTau;
+        transportSystems.keySet().forEach(
+                key -> {
+                    if (!key.equals(lastTransportSystemId)) {
+                        transportSystems.get(key).processingTransportSystem(finishTau, finishTau);
+                    }
+                }
+        );
     }
 
     private static Double getFinishCoefficientTime(Double startTime, TreeMap<Double, String> sortedByStartTimeTransportSystems) {
