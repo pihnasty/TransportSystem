@@ -112,6 +112,7 @@
     },
     {
       "id" : 3,
+      "reversible" : 8,
       "connections" : {
         "4": {}
       },

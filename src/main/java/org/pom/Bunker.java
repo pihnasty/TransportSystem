@@ -143,12 +143,22 @@ public class Bunker {
     }
 
     public void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTime, List<Double> taus, BunkerOutputFlow bunkerOutputFlow) {
+        if (currentTau == previousFinishTime || tauToBunkerParametersMap.isEmpty()) {
+            return;
+        }
+        Double lastTau = 0.0;
+        try{
+            lastTau = tauToBunkerParametersMap.lastKey();
+        } catch (Exception e) {
+            System.out.println();
+        }
+
         var lastEntry = tauToBunkerParametersMap.lastEntry();
         var capacity = lastEntry.getValue().get(Constants.ColumnsNames.BUNKER_CAPACITY);
         var overMaxCapacity = lastEntry.getValue().get(Constants.ColumnsNames.BUNKER_OVER_MAX_CAPACITY);
         var densityOverMaxCapacity = lastEntry.getValue().get(Constants.ColumnsNames.DENSITY_OVER_MAX_CAPACITY);
-
-        taus.stream().filter(tau -> previousFinishTime <= tau && tau < currentTau).forEach(
+        Double finalLastTau = lastTau;
+        taus.stream().filter(tau -> finalLastTau <= tau && tau < currentTau).forEach(
                 tau -> {
                     var bunkerParameters = getBunkerParameters(
                             0.0, getBunkerOutputFlowValueByTau(tau, bunkerOutputFlow), 0.0, 0.0,

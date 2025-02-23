@@ -30,12 +30,14 @@ public class Conveyor {
     @Setter
     private InitialDensity initialDensity;
     private final int id;
-    private final boolean reversible;
+    private final int reversible;
+    @Setter
+    private boolean isStarted = false;
 
     @JsonCreator
     public Conveyor(
             @JsonProperty(Constants.JsonParametersNames.ID) int id,
-            @JsonProperty(Constants.JsonParametersNames.REVERSIBLE) boolean reversible,
+            @JsonProperty(Constants.JsonParametersNames.REVERSIBLE) int reversible,
             @JsonProperty("bunker") Bunker bunker,
             @JsonProperty("density") Density density,
             @JsonProperty("speed") Speed speed,
@@ -151,5 +153,9 @@ public class Conveyor {
         this.density = conveyor.density;
 
         this.transportDelay = conveyor.transportDelay;
+    }
+
+    public boolean isReversible() {
+        return reversible > 0;
     }
 }

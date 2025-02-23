@@ -35,7 +35,7 @@ class ConveyorTest {
         when(densityMock.getMaxAvailableDensity()).thenReturn(TestConstant.MAX_AVAILABLE_DENSITY);
 
         // Create the Conveyor instance with mocks
-        conveyor = new Conveyor(1, false, bunkerMock, densityMock, speedMock,
+        conveyor = new Conveyor(1, -1, bunkerMock, densityMock, speedMock,
                 inputFlowMock, bunkerOutputFlowMock, initialDensityMock, null, TestConstant.CONVEYOR_LENGTH);
     }
 

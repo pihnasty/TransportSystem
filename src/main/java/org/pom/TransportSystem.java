@@ -106,6 +106,9 @@ public class TransportSystem {
         taus.stream().filter(t -> t >= startTime && t < finishTime).
                 forEach(tau -> conveyors.forEach(conveyor -> calculatedConveyorParameters(tau, conveyor)));
 
+        taus.stream().filter(t -> t == startTime && startTime == finishTime).
+                forEach(tau -> conveyors.forEach(conveyor -> calculatedConveyorParameters(tau, conveyor)));
+
         SettingsManager settingsManager = new SettingsManager();
         var cellFormat = settingsManager.getPrepareDataTableFormat().getCellFormat();
         var locale = settingsManager.getApp().getLocale();
@@ -192,12 +195,14 @@ public class TransportSystem {
         inputConveyorNumbers.forEach(
                 inputConveyorNumber -> {
                     var inputConveyor = getConveyorById(inputConveyorNumber);
-                    if (inputConveyor.getOutputFlow().lastKey()< tau) {
+                    if (inputConveyor.getOutputFlow().keys().isEmpty() || inputConveyor.getOutputFlow().lastKey()< tau) {
                         calculatedConveyorParameters(tau, inputConveyor);
                     }
                 }
         );
-        calculatedParameters(tau, conveyor);
+        if(!conveyor.getOutputFlow().getTauToFlowOutputMap().containsKey(tau)) {
+            calculatedParameters(tau, conveyor);
+        }
     }
 
     private Conveyor getConveyorById(Integer id) {

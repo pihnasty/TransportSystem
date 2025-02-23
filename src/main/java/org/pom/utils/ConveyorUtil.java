@@ -6,7 +6,11 @@ import java.util.TreeMap;
 public class ConveyorUtil {
 
     public static void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTime, List<Double> taus, TreeMap<Double, Double> treeMap, Double defaultValue) {
-        taus.stream().filter(tau -> previousFinishTime <= tau && tau < currentTau).forEach(
+        if(currentTau == previousFinishTime  || treeMap.isEmpty()){
+            return;
+        }
+        var lastTau = treeMap.lastKey();
+        taus.stream().filter(tau -> lastTau <= tau && tau < currentTau).forEach(
                 tau -> treeMap.put(tau, defaultValue)
         );
     }

@@ -12,7 +12,7 @@ app:
       "startTimes": [0.0, 0.4, 0.8]
     "E:\\A\\TransportSystem\\src\\main\\resources\\project\\data2.json":
       "id": "2"
-      "startTimes": [ 0.2, 0.6]
+      "startTimes": [ 0.2, 0.6, 1.0]
 
 prepareDataTableFormat:
   minWidth: 10

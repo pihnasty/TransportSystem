@@ -12,7 +12,7 @@ public class ConveyorDataGenerator extends Conveyor {
     @JsonCreator
     public ConveyorDataGenerator(
             @JsonProperty(Constants.JsonParametersNames.ID) int id,
-            @JsonProperty(Constants.JsonParametersNames.REVERSIBLE) boolean reversible,
+            @JsonProperty(Constants.JsonParametersNames.REVERSIBLE) int reversible,
             @JsonProperty("bunker") Bunker bunker,
             @JsonProperty("density") Density density,
             @JsonProperty("speed") SpeedDataGenerator speed,

@@ -8,7 +8,7 @@
     {
       "id" : 1,
       "connections" : {
-        "3": {}
+        "8": {}
       },
       "bunker" : {
         "initialCapacity" : 0.5,
@@ -112,7 +112,7 @@
     },
     {
       "id" : 8,
-      "reversible" : true,
+      "reversible" : 3,
       "connections" : {
         "5": {}
       },
