@@ -4,7 +4,7 @@ app:
   locale: Locale.US
 
   "researchTau": 100.0
-  "deltaTau": 0.1
+  "deltaTau": 1.0
   "deltaLength" : 0.01
   initTransportSystemFiles:
     "E:\\A\\TransportSystem\\src\\main\\resources\\project\\data.json" :

@@ -146,12 +146,7 @@ public class Bunker {
         if (currentTau == previousFinishTime || tauToBunkerParametersMap.isEmpty()) {
             return;
         }
-        Double lastTau = 0.0;
-        try{
-            lastTau = tauToBunkerParametersMap.lastKey();
-        } catch (Exception e) {
-            System.out.println();
-        }
+        Double lastTau = tauToBunkerParametersMap.lastKey();
 
         var lastEntry = tauToBunkerParametersMap.lastEntry();
         var capacity = lastEntry.getValue().get(Constants.ColumnsNames.BUNKER_CAPACITY);

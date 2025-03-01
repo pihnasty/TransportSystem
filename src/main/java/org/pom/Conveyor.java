@@ -163,6 +163,7 @@ public class Conveyor {
         conveyor.density.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
         this.density = conveyor.density;
 
+        conveyor.transportDelay.fillEmptyParametersByCurrentTau(currentTau, previousFinishTime, taus);
         this.transportDelay = conveyor.transportDelay;
     }
 

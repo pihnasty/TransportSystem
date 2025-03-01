@@ -116,6 +116,9 @@ public class TransportDelay implements KeysValuesProvider<Double> {
     }
 
     public void fillEmptyParametersByCurrentTau(double currentTau, double previousFinishTau, List<Double> taus)  {
+        if (currentTau == previousFinishTau || delayToDistance.isEmpty()) {
+            return;
+        }
         var lastDistance = delayToDistance.lastKey();
         var lastTau = previousFinishTau; // distanceToDelay.lastKey();
         taus.stream().filter(tau -> lastTau < tau && tau < currentTau).forEach(

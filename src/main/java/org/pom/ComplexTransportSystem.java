@@ -141,6 +141,5 @@ public class ComplexTransportSystem {
     public static void main(String[] args) {
         var complexTransportSystem = new ComplexTransportSystem();
         complexTransportSystem.start();
-        System.out.println("transportSystem");
     }
 }
