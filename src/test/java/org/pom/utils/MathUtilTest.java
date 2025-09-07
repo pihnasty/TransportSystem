@@ -15,7 +15,7 @@ public class MathUtilTest {
                 IllegalArgumentException.class, () -> MathUtil.getValueByKey(treeMap, 1.5)
         );
 
-        assertTrue(thrown.getMessage().contains("The specified value of key must lie between the minimum and maximum keys in the map."));
+        assertTrue(thrown.getMessage().contains("The specified key value 1.5 must lie between the minimum 1.0  and maximum 1.0 keys in the map."));
     }
 
     @Test
@@ -30,7 +30,7 @@ public class MathUtilTest {
                 "Expected getClosestValueRecursive() to throw, but it didn't"
         );
 
-        assertTrue(thrown.getMessage().contains("must lie between the minimum and maximum keys"));
+        assertTrue(thrown.getMessage().contains("The specified key value 0.5 must lie between the minimum 1.0  and maximum 3.0 keys in the map."));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class MathUtilTest {
                 "Expected getClosestValueRecursive() to throw, but it didn't"
         );
 
-        assertTrue(thrown.getMessage().contains("must lie between the minimum and maximum keys"));
+        assertTrue(thrown.getMessage().contains("The specified key value 4.0 must lie between the minimum 1.0  and maximum 3.0 keys in the map."));
     }
 
     @Test

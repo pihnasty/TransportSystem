@@ -3,16 +3,13 @@ app:
   version: 1.0.0
   locale: Locale.US
 
-  "researchTau": 100.0
-  "deltaTau": 1.0
+  "researchTau": 5.0
+  "deltaTau": 0.01
   "deltaLength" : 0.01
   initTransportSystemFiles:
     "E:\\A\\TransportSystem\\src\\main\\resources\\project\\data.json" :
       "id": "1"
-      "startTimes": [0.0, 0.4, 0.8]
-    "E:\\A\\TransportSystem\\src\\main\\resources\\project\\data2.json":
-      "id": "2"
-      "startTimes": [ 0.2, 0.6, 1.0]
+      "startTimes": [0.0, 1.0]
 
 prepareDataTableFormat:
   minWidth: 10

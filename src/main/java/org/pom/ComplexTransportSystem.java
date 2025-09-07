@@ -2,8 +2,7 @@ package org.pom;
 
 import org.pom.utils.yaml.SettingsManager;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ComplexTransportSystem {
@@ -17,54 +16,17 @@ public class ComplexTransportSystem {
         TreeMap<Double, String> sortedByStartTimeTransportSystems = sortedByStartTimeTransportSystems();
 
         var researchTau = settingsManager.getApp().getResearchTau();
-        var taus = transportSystems.values().stream().findFirst().get().getTaus();
-
-        Map<Integer, Conveyor> conveyors = new TreeMap<>();
-        transportSystems.values().forEach(
-                transportSystem -> {
-                    transportSystem.getConveyors().forEach(
-                            conveyor -> conveyors.put(conveyor.getId(), conveyor)
-                    );
-                }
-        );
-
         AtomicReference<String> lastTransportSystemId = new AtomicReference<>("");
 
         sortedByStartTimeTransportSystems.keySet().forEach(
                 startCoefficientTime -> {
                     var finishCoefficientTime = getFinishCoefficientTime(startCoefficientTime, sortedByStartTimeTransportSystems);
-                    var previousCoefficientTime = getPreviousFinishCoefficientTime(startCoefficientTime, sortedByStartTimeTransportSystems);
                     TransportSystem transportSystem
                             = transportSystems.get(sortedByStartTimeTransportSystems.get(startCoefficientTime));
-                    transportSystem.getConveyors().forEach(
-                            conveyor -> {
-                                var previousStateConveyor = conveyors.get(conveyor.getId());
-                                    if (conveyor.isReversible()) {
-                                        var previousReversibleStateConveyor = conveyors.get(conveyor.getReversible());
-                                        conveyor.copyReversibleMainParameters(
-                                                previousStateConveyor,
-                                                previousReversibleStateConveyor,
-                                                startCoefficientTime * researchTau,
-                                                previousCoefficientTime * researchTau,
-                                                transportSystem.getDeltaTau(),
-                                                taus);
-                                    } else {
-                                        conveyor.copyMainParameters(
-                                                previousStateConveyor,
-                                                startCoefficientTime * researchTau,
-                                                previousCoefficientTime * researchTau,
-                                                taus);
-                                    }
-                            });
-
                     transportSystem.processingTransportSystem(startCoefficientTime * researchTau, finishCoefficientTime *researchTau);
-                    transportSystem.getConveyors().forEach(
-                            conveyor -> conveyors.put(conveyor.getId(), conveyor)
-                    );
                     lastTransportSystemId.set(sortedByStartTimeTransportSystems.get(startCoefficientTime));
                 }
         );
-        fillOtherTransportSystems(transportSystems, lastTransportSystemId.get(), sortedByStartTimeTransportSystems, researchTau);
     }
 
     /**

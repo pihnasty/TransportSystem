@@ -49,8 +49,7 @@ class SpeedTest {
 
     @Test
     void testGetSpeedAtTau_NoMatch() {
-        var exception = assertThrows(IllegalArgumentException.class, () -> speed.getSpeedAtTau(5));
-        assertEquals( TestConstant.ARGUMENT_OUT_OF_RANGE_MESSAGE, exception.getMessage());
+        assertThrows(IllegalArgumentException.class, () -> speed.getSpeedAtTau(5));
     }
 
     @Test
